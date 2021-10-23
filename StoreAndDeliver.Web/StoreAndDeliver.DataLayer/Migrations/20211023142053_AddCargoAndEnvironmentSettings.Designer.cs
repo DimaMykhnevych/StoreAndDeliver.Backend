@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StoreAndDeliver.DataLayer.DbContext;
 
 namespace StoreAndDeliver.DataLayer.Migrations
 {
     [DbContext(typeof(StoreAndDeliverDbContext))]
-    partial class StoreAndDeliverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211023142053_AddCargoAndEnvironmentSettings")]
+    partial class AddCargoAndEnvironmentSettings
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -290,32 +292,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.ToTable("CargoSettings");
                 });
 
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Carrier", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("AppUserId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("CompanyName")
-                        .HasColumnType("longtext");
-
-                    b.Property<double>("CurrentOccupiedVolume")
-                        .HasColumnType("double");
-
-                    b.Property<double>("MaxCargoVolume")
-                        .HasColumnType("double");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
-
-                    b.ToTable("Carriers");
-                });
-
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.EnvironmentSetting", b =>
                 {
                     b.Property<Guid>("Id")
@@ -375,53 +351,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.HasIndex("ToAddressId");
 
                     b.ToTable("Requests");
-                });
-
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Shipping", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CargoRequestId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("CarrierId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CargoRequestId");
-
-                    b.HasIndex("CarrierId");
-
-                    b.ToTable("Shippings");
-                });
-
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Store", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("AddressId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<double>("CurrentOccupiedVolume")
-                        .HasColumnType("double");
-
-                    b.Property<double>("MaxCargoVolume")
-                        .HasColumnType("double");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AddressId")
-                        .IsUnique();
-
-                    b.ToTable("Stores");
                 });
 
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.UserRole", b =>
@@ -540,17 +469,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Navigation("EnvironmentSetting");
                 });
 
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Carrier", b =>
-                {
-                    b.HasOne("StoreAndDeliver.DataLayer.Models.AppUser", "AppUser")
-                        .WithOne("Carrier")
-                        .HasForeignKey("StoreAndDeliver.DataLayer.Models.Carrier", "AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Request", b =>
                 {
                     b.HasOne("StoreAndDeliver.DataLayer.Models.AppUser", "AppUser")
@@ -578,49 +496,15 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Navigation("ToAddress");
                 });
 
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Shipping", b =>
-                {
-                    b.HasOne("StoreAndDeliver.DataLayer.Models.CargoRequest", "CargoRequest")
-                        .WithMany("Shippings")
-                        .HasForeignKey("CargoRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("StoreAndDeliver.DataLayer.Models.Carrier", "Carrier")
-                        .WithMany("Shippings")
-                        .HasForeignKey("CarrierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CargoRequest");
-
-                    b.Navigation("Carrier");
-                });
-
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Store", b =>
-                {
-                    b.HasOne("StoreAndDeliver.DataLayer.Models.Address", "Address")
-                        .WithOne("Store")
-                        .HasForeignKey("StoreAndDeliver.DataLayer.Models.Store", "AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Address");
-                });
-
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Address", b =>
                 {
                     b.Navigation("RequestsFrom");
 
                     b.Navigation("RequestsTo");
-
-                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.AppUser", b =>
                 {
-                    b.Navigation("Carrier");
-
                     b.Navigation("Requests");
                 });
 
@@ -629,16 +513,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Navigation("CargoRequests");
 
                     b.Navigation("CargoSettings");
-                });
-
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.CargoRequest", b =>
-                {
-                    b.Navigation("Shippings");
-                });
-
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Carrier", b =>
-                {
-                    b.Navigation("Shippings");
                 });
 
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.EnvironmentSetting", b =>
