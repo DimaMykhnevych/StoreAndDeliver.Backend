@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StoreAndDeliver.BusinessLayer.Options;
 using StoreAndDeliver.Web.Options;
 
 namespace StoreAndDeliver.Web.Installers
@@ -9,6 +10,7 @@ namespace StoreAndDeliver.Web.Installers
         public void InstallServices(IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<MySqlConfigOptions>(configuration.GetSection("ConnectionStrings:Default"));
+            services.Configure<EmailServiceOptions>(configuration.GetSection("EmailServiceOptions"));
         }
     }
 }
