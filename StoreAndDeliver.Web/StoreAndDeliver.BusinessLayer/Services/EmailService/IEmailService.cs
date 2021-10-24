@@ -5,6 +5,6 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
 {
     public interface IEmailService
     {
-        Task SendEmail(AppUser receiver, string url);
+        Task SendEmail(AppUser receiver, string url, string language);
     }
 }

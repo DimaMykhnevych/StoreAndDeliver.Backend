@@ -32,9 +32,10 @@ namespace StoreAndDeliver.Web.Controllers
         public async Task<IActionResult> Post([FromBody] CreateUserDto model)
         {
             model.Role = "User";
+            var language = Request.Headers["language"];
             try
             {
-                return Ok(await _service.CreateUserAsync(model));
+                return Ok(await _service.CreateUserAsync(model, language));
             }
             catch (UsernameAlreadyTakenException)
             {

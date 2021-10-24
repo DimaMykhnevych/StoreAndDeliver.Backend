@@ -1,8 +1,12 @@
 ﻿using Microsoft.Extensions.Options;
 using StoreAndDeliver.BusinessLayer.Options;
+using StoreAndDeliver.BusinessLayer.Resources;
 using StoreAndDeliver.DataLayer.Models;
+using System.Globalization;
 using System.Net;
 using System.Net.Mail;
+using System.Resources;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.BusinessLayer.Services.EmailService
@@ -16,23 +20,25 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
             _emailServiceDetails = options.Value;
         }
 
-        public async Task SendEmail(AppUser user, string url)
+        public async Task SendEmail(AppUser user, string url, string language)
         {
             MailAddress addressFrom = new MailAddress(_emailServiceDetails.EmailAddress, "Store&Deliver");
             MailAddress addressTo = new MailAddress(user.Email);
             MailMessage message = new MailMessage(addressFrom, addressTo);
 
-            message.Subject = "Account Confirmation";
+            ResourceManager resourceManager = GetResourceManager(language);
+
+            message.Subject = resourceManager.GetString("EmailSubject");
             message.IsBodyHtml = true;
             string htmlString = @$"<html>
                       <body style='background-color: #f7f1d5; 
                         padding: 15px; border-radius: 15px; 
                         box-shadow: 5px 5px 15px 5px #9F9F9F;
                         font-size: 16px;'>
-                      <p>Hello {user.UserName},</p>
-                      <p>Please, confirm your account by clicking the following link.</p>
-                      <a href={url}>Confirm Account</a>
-                         <p>Thank you,<br>-Store&Deliver</br></p>
+                      <p>{resourceManager.GetString("Hello")} {user.UserName},</p>
+                      <p>{resourceManager.GetString("EmailMainContent")}</p>
+                      <a href={url}>{resourceManager.GetString("ConfirmAccount")}</a>
+                         <p>{resourceManager.GetString("ThankYou")},<br>-Store&Deliver</br></p>
                       </body>
                       </html>
                      ";
@@ -42,6 +48,21 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
             smtp.Credentials = new NetworkCredential(_emailServiceDetails.EmailAddress, _emailServiceDetails.Password);
             smtp.EnableSsl = true;
             await smtp.SendMailAsync(message);
+        }
+
+        private ResourceManager GetResourceManager(string language)
+        {
+            switch (language)
+            {
+                case "ua":
+                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.ua", typeof(ua).Assembly);
+                case "en":
+                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.en", typeof(en).Assembly);
+                case "ru":
+                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.ru", typeof(ru).Assembly);
+                default:
+                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.en", typeof(en).Assembly);
+            }
         }
     }
 }
