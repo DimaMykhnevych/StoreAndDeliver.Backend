@@ -32,6 +32,10 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
 
         public async Task<AppUser> CreateUserAsync(CreateUserDto model)
         {
+            if(model.ConfirmPassword != model.Password)
+            {
+                throw new PasswordsMismatchException();
+            }
             AppUser existingUser = await _userManager.FindByNameAsync(model.UserName);
             if (existingUser != null)
             {

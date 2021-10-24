@@ -40,6 +40,10 @@ namespace StoreAndDeliver.Web.Controllers
             {
                 return BadRequest(AddModelStateError("username", ErrorMessagesConstants.USERNAME_ALREADY_TAKEN));
             }
+            catch (PasswordsMismatchException)
+            {
+                return BadRequest(AddModelStateError("password", ErrorMessagesConstants.PASSWORDS_DO_NOT_MATCH));
+            }
         }
 
         [HttpPost("confirmEmail")]
