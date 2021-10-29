@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
+using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
+using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
 using StoreAndDeliver.DataLayer.Repositories.UserRepository;
 
 namespace StoreAndDeliver.Web.Installers
@@ -24,6 +26,8 @@ namespace StoreAndDeliver.Web.Installers
 
             // repositories
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IEnvironmentSettingRepository, EnvironmentSettingRepository>();
+            services.AddTransient<IEnvironmnetSettingService, EnvironmnetSettingService>();
         }
     }
 }
