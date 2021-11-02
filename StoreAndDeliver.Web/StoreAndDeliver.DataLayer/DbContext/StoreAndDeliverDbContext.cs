@@ -22,6 +22,7 @@ namespace StoreAndDeliver.DataLayer.DbContext
         public DbSet<Carrier> Carriers { get; set; }
         public DbSet<Shipping> Shippings { get; set; }
         public DbSet<Store> Stores { get; set; }
+        public DbSet<City> Cities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

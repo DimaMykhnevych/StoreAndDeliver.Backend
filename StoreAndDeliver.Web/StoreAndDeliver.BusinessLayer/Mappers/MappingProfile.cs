@@ -14,6 +14,7 @@ namespace StoreAndDeliver.BusinessLayer.Mappers
 
             CreateMap<EnvironmentSettingDto, EnvironmentSetting>().ReverseMap();
             CreateMap<AddressDto, Address>().ReverseMap();
+            CreateMap<CityDto, City>().ReverseMap();
         }
     }
 }
