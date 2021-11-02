@@ -13,6 +13,7 @@ namespace StoreAndDeliver.BusinessLayer.Mappers
                     .ForMember(u => u.UserName, m => m.MapFrom(u => u.UserName));
 
             CreateMap<EnvironmentSettingDto, EnvironmentSetting>().ReverseMap();
+            CreateMap<AddressDto, Address>().ReverseMap();
         }
     }
 }
