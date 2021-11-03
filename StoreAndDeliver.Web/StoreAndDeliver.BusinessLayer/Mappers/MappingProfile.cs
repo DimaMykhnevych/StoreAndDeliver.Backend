@@ -15,6 +15,9 @@ namespace StoreAndDeliver.BusinessLayer.Mappers
             CreateMap<EnvironmentSettingDto, EnvironmentSetting>().ReverseMap();
             CreateMap<AddressDto, Address>().ReverseMap();
             CreateMap<CityDto, City>().ReverseMap();
+            CreateMap<AddCargoDto, Cargo>().ReverseMap();
+            CreateMap<RequestDto, Request>().ReverseMap();
+            CreateMap<CargoSettingDto, CargoSetting>().ReverseMap();
         }
     }
 }

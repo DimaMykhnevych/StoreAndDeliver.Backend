@@ -6,11 +6,13 @@ using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
 using StoreAndDeliver.BusinessLayer.Services.CityService;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
+using StoreAndDeliver.BusinessLayer.Services.RequestService;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
 using StoreAndDeliver.DataLayer.Builders.CitiesQueryBuilder;
 using StoreAndDeliver.DataLayer.Repositories.AddressRepository;
 using StoreAndDeliver.DataLayer.Repositories.CityRepository;
 using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
+using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
 using StoreAndDeliver.DataLayer.Repositories.UserRepository;
 
 namespace StoreAndDeliver.Web.Installers
@@ -29,6 +31,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IEnvironmnetSettingService, EnvironmnetSettingService>();
             services.AddTransient<IAddressService, AddressService>();
             services.AddTransient<ICityService, CityService>();
+            services.AddTransient<IRequestService, RequestService>();
 
             // builders
             services.AddTransient<ICitiesQueryBuilder, CitiesQueryBuilder>();
@@ -38,6 +41,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IEnvironmentSettingRepository, EnvironmentSettingRepository>();
             services.AddTransient<IAddressRepository, AddressRepository>();
             services.AddTransient<ICityRepository, CityRepository>();
+            services.AddTransient<IRequestRepository, RequestRepository>();
         }
     }
 }
