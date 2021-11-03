@@ -7,6 +7,7 @@ using StoreAndDeliver.BusinessLayer.Services.CityService;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
+using StoreAndDeliver.DataLayer.Builders.CitiesQueryBuilder;
 using StoreAndDeliver.DataLayer.Repositories.AddressRepository;
 using StoreAndDeliver.DataLayer.Repositories.CityRepository;
 using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
@@ -30,6 +31,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICityService, CityService>();
 
             // builders
+            services.AddTransient<ICitiesQueryBuilder, CitiesQueryBuilder>();
 
             // repositories
             services.AddTransient<IUserRepository, UserRepository>();

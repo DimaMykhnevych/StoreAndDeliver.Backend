@@ -21,9 +21,9 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCities()
+        public IActionResult GetCities([FromQuery] SearchCityDto searchCityDto)
         {
-            IEnumerable<CityDto> cities = await _cityService.GetCities();
+            IEnumerable<CityDto> cities =  _cityService.GetCities(searchCityDto);
             return Ok(cities);
         }
 

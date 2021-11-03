@@ -7,7 +7,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CityService
 {
     public interface ICityService
     {
-        Task<IEnumerable<CityDto>> GetCities();
+        IEnumerable<CityDto> GetCities(SearchCityDto searchCityDto);
         Task<CityDto> AddCity(CityDto cityDto);
         Task<bool> DeleteCity(Guid id);
     }

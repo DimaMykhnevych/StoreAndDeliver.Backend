@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using StoreAndDeliver.BusinessLayer.DTOs;
+using StoreAndDeliver.DataLayer.Builders.CitiesQueryBuilder;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CityRepository;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.BusinessLayer.Services.CityService
@@ -12,16 +14,24 @@ namespace StoreAndDeliver.BusinessLayer.Services.CityService
     {
         private readonly ICityRepository _cityRepository;
         private readonly IMapper _mapper;
+        private readonly ICitiesQueryBuilder _builder;
 
-        public CityService(ICityRepository cityRepository, IMapper mapper)
+        public CityService(ICityRepository cityRepository, IMapper mapper, ICitiesQueryBuilder builder)
         {
             _cityRepository = cityRepository;
             _mapper = mapper;
+            _builder = builder;
         }
 
-        public async Task<IEnumerable<CityDto>> GetCities()
+        public IEnumerable<CityDto> GetCities(SearchCityDto searchCityDto)
         {
-            IEnumerable<City> cities = await _cityRepository.GetAll();
+            List<City> cities =
+                _builder.SetBaseCityInfo()
+                .SetCityName(searchCityDto.City)
+                .SetCountryName(searchCityDto.Country)
+                .Build()
+                .ToList();
+
             return _mapper.Map<IEnumerable<CityDto>>(cities);
         }
 
