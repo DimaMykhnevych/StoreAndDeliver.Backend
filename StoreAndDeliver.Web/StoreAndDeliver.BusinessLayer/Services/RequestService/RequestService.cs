@@ -20,7 +20,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         public async Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto)
         {
             decimal bonus = await CalculateBonusForUser(requestAddDto.CurrentUserId);
-            double totalWeight = requestAddDto.Cargo.Sum(x => x.Weight);
+            double totalWeight = requestAddDto.Cargo.Sum(x => x.Weight * x.Amount);
             int settingsAmount = requestAddDto.Cargo.SelectMany(c => c.Settings).Count();
 
             return (settingsAmount * 10 + (decimal)(totalWeight * 3)) / bonus;
