@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StoreAndDeliver.DataLayer.Models;
+using System;
 using System.Collections.Generic;
 
 namespace StoreAndDeliver.BusinessLayer.DTOs
@@ -9,5 +10,6 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
         public RequestDto Request { get; set; }
         public IEnumerable<AddCargoDto> Cargo { get; set; }
         public string CurrentLanguage { get; set; }
+        public Units Units { get; set; }
     }
 }

@@ -81,7 +81,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
             ValidateIdentityResult(deleteUserResult);
         }
 
-        private void ValidateIdentityResult(IdentityResult result)
+        private static void ValidateIdentityResult(IdentityResult result)
         {
             if (!result.Succeeded)
             {

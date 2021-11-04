@@ -64,7 +64,7 @@ namespace StoreAndDeliver.Web.Controllers
             return Ok();
         }
 
-        private ModelStateDictionary AddModelStateError(String field, String error)
+        private static ModelStateDictionary AddModelStateError(String field, String error)
         {
             ModelStateDictionary modelState = new ModelStateDictionary();
             modelState.TryAddModelError(field, error);

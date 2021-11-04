@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StoreAndDeliver.BusinessLayer.Clients.ExchangerApiClient;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
 using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
 using StoreAndDeliver.BusinessLayer.Services.CityService;
+using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
@@ -32,6 +34,10 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IAddressService, AddressService>();
             services.AddTransient<ICityService, CityService>();
             services.AddTransient<IRequestService, RequestService>();
+            services.AddTransient<IConvertionService, ConvertionService>();
+
+            //clients
+            services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
 
             // builders
             services.AddTransient<ICitiesQueryBuilder, CitiesQueryBuilder>();

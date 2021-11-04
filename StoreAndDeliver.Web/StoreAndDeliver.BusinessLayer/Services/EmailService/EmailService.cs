@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
+using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.Options;
 using StoreAndDeliver.BusinessLayer.Resources;
 using StoreAndDeliver.DataLayer.Models;
-using System.Globalization;
 using System.Net;
 using System.Net.Mail;
 using System.Resources;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.BusinessLayer.Services.EmailService
@@ -44,25 +43,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
                      ";
             message.Body = htmlString;
 
-            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587);
-            smtp.Credentials = new NetworkCredential(_emailServiceDetails.EmailAddress, _emailServiceDetails.Password);
-            smtp.EnableSsl = true;
+            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+            {
+                Credentials = new NetworkCredential(_emailServiceDetails.EmailAddress, _emailServiceDetails.Password),
+                EnableSsl = true
+            };
             await smtp.SendMailAsync(message);
         }
 
-        private ResourceManager GetResourceManager(string language)
+        private static ResourceManager GetResourceManager(string language)
         {
-            switch (language)
+            return language switch
             {
-                case "ua":
-                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.ua", typeof(ua).Assembly);
-                case "en":
-                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.en", typeof(en).Assembly);
-                case "ru":
-                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.ru", typeof(ru).Assembly);
-                default:
-                    return new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.en", typeof(en).Assembly);
-            }
+                Languages.UKRAINAN => new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.ua", typeof(ua).Assembly),
+                Languages.ENGLISH => new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.en", typeof(en).Assembly),
+                Languages.RUSSIAN => new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.ru", typeof(ru).Assembly),
+                _ => new ResourceManager("StoreAndDeliver.BusinessLayer.Resources.en", typeof(en).Assembly),
+            };
         }
     }
 }

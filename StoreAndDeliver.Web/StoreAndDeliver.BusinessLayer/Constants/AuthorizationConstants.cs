@@ -2,6 +2,6 @@
 {
     public static class AuthorizationConstants
     {
-        public static string ID = "Id";
+        public const string ID = "Id";
     }
 }

@@ -1,4 +1,9 @@
-﻿using StoreAndDeliver.BusinessLayer.DTOs;
+﻿using Microsoft.Extensions.Options;
+using StoreAndDeliver.BusinessLayer.Constants;
+using StoreAndDeliver.BusinessLayer.DTOs;
+using StoreAndDeliver.BusinessLayer.Options;
+using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
+using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
 using System;
@@ -11,19 +16,29 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
     public class RequestService : IRequestService
     {
         private readonly IRequestRepository _requestRepository;
+        private readonly IConvertionService _convertionService;
 
-        public RequestService(IRequestRepository requestRepository)
+        public RequestService(IRequestRepository requestRepository, IConvertionService convertionService)
         {
             _requestRepository = requestRepository;
+            _convertionService = convertionService;
         }
 
         public async Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto)
         {
             decimal bonus = await CalculateBonusForUser(requestAddDto.CurrentUserId);
             double totalWeight = requestAddDto.Cargo.Sum(x => x.Weight * x.Amount);
+            double totalWeigthInKg = _convertionService.ConvertWeigth(requestAddDto.Units.Weight, WeightUnit.Kilograms, totalWeight);
             int settingsAmount = requestAddDto.Cargo.SelectMany(c => c.Settings).Count();
+            decimal sum =  (settingsAmount * 10 + (decimal)(totalWeigthInKg * 3)) / bonus;
 
-            return (settingsAmount * 10 + (decimal)(totalWeight * 3)) / bonus;
+            if (requestAddDto.CurrentLanguage != Languages.ENGLISH)
+            {
+                string toCurrency = GetToCurrency(requestAddDto.CurrentLanguage);
+                return await _convertionService.ConvertCurrency(Currency.Usd, toCurrency, sum);
+            }
+
+            return sum;
         }
 
         private async Task<decimal> CalculateBonusForUser(Guid id)
@@ -40,5 +55,17 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                     return 1.4M;
             }
         }
+
+        private static string GetToCurrency(string currentLanguage)
+        {
+
+            return currentLanguage switch
+            {
+                Languages.RUSSIAN => Currency.Rub,
+                Languages.UKRAINAN => Currency.Uah,
+                _ => Currency.Usd
+            };
+        }
+
     }
 }

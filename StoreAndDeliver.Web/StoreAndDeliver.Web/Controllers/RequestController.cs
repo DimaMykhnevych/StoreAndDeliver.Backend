@@ -23,7 +23,6 @@ namespace StoreAndDeliver.Web.Controllers
         [Route("price")]
         public async Task<IActionResult> GetRequestPrice([FromBody] AddRequestDto addRequestDto)
         {
-            //TODO: check reauest type, it's wrong
             //Don't forget to set request date
             addRequestDto.CurrentUserId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
             decimal price = await _requestService.CalculateRequestPrice(addRequestDto);
