@@ -6,5 +6,8 @@ namespace StoreAndDeliver.DataLayer.Models
     { 
         public WeightUnit Weight { get; set; }
         public LengthUnit Length { get; set; }
+        public TemperatureUnit Temperature { get; set; }
+        public HumidityUnit Humidity { get; set; }
+        public LuminosityUnit Luminosity { get; set; }
     }
 }
