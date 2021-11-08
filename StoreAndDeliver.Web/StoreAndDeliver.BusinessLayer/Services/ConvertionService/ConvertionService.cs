@@ -49,6 +49,42 @@ namespace StoreAndDeliver.BusinessLayer.Services.ConvertionService
             throw new Exception("Currency convertion failed");
         }
 
+        public double ConvertTemperature(TemperatureUnit from, TemperatureUnit to, double value)
+        {
+            if (from == to)
+            {
+                return value;
+            }
+            Dictionary<TemperatureUnit, Dictionary<TemperatureUnit, double>> tempDictionary = new()
+            {
+                { TemperatureUnit.Fahrenheit, new() },
+                { TemperatureUnit.Celsius, new() },
+                { TemperatureUnit.Kelvin, new() }
+
+            };
+            switch (from) {
+                case TemperatureUnit.Celsius:
+                    tempDictionary[TemperatureUnit.Celsius]
+                        .Add(TemperatureUnit.Fahrenheit, value * 9 / 5 + 32);
+                    tempDictionary[TemperatureUnit.Celsius]
+                        .Add(TemperatureUnit.Kelvin, value + 273.15);
+                    break;
+                case TemperatureUnit.Fahrenheit:
+                    tempDictionary[TemperatureUnit.Fahrenheit]
+                        .Add(TemperatureUnit.Celsius, (value - 32) * 5 / 9);
+                    tempDictionary[TemperatureUnit.Fahrenheit]
+                        .Add(TemperatureUnit.Kelvin, ((value - 32) * 5 / 9) + 273.15);
+                    break;
+                case TemperatureUnit.Kelvin:
+                    tempDictionary[TemperatureUnit.Kelvin]
+                       .Add(TemperatureUnit.Fahrenheit, ((value - 273.15) * 9 / 5) + 32);
+                    tempDictionary[TemperatureUnit.Kelvin]
+                        .Add(TemperatureUnit.Celsius, value - 273.15);
+                    break;
+            }
+            return tempDictionary[from][to];
+        }
+
         public double ConvertLength(LengthUnit from, LengthUnit to, double value)
         {
             double coefficient = _lengthDictionary[from] / _lengthDictionary[to];

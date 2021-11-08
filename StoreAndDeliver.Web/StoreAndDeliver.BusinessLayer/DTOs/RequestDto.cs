@@ -21,5 +21,7 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
         public Guid FromAddressId { get; set; }
         public Guid ToAddressId { get; set; }
         public Guid AppUserId { get; set; }
+        public AddressDto FromAddress { get; set; }
+        public AddressDto ToAddress { get; set; }
     }
 }

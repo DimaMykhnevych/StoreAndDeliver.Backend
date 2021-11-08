@@ -2,6 +2,8 @@
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.AddressRepository;
+using StoreAndDeliver.DataLayer.Repositories.CityRepository;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,12 +12,16 @@ namespace StoreAndDeliver.BusinessLayer.Services.AddressService
     public class AddressService : IAddressService
     {
         private readonly IAddressRepository _addressRepository;
+        private readonly ICityRepository _cityRepository;
         private readonly IMapper _mapper;
 
-        public AddressService(IAddressRepository addressRepository, IMapper mapper)
+        public AddressService(IAddressRepository addressRepository, 
+            ICityRepository cityRepository, 
+            IMapper mapper)
         {
             _addressRepository = addressRepository;
             _mapper = mapper;
+            _cityRepository = cityRepository;
         }
 
         public async Task<IEnumerable<AddressDto>> GetAddresses()
@@ -27,10 +33,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.AddressService
         public async Task<AddressDto> AddAddress(AddressDto addressDto)
         {
             Address address = _mapper.Map<Address>(addressDto);
-            address.Id = new System.Guid();
+            Address existingAddress = await _addressRepository.Get(address.Id);
+            if(existingAddress != null)
+            {
+                return _mapper.Map<AddressDto>(existingAddress);
+            }
+            address.Id = Guid.NewGuid();
+            await GetAddressCoordinates(address);
             var addedAddress = await _addressRepository.Insert(address);
             await _addressRepository.Save();
             return _mapper.Map<AddressDto>(addedAddress);
+        }
+
+        private async Task GetAddressCoordinates(Address address)
+        {
+            City city = await _cityRepository.GetCityByAddress(address);
+            address.Latitude = city.Latitude;
+            address.Longtitude = city.Longtitude;
         }
     }
 }

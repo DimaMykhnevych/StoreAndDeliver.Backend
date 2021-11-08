@@ -20,13 +20,22 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> AddRequest([FromBody] AddRequestDto addRequestDto)
+        {
+            addRequestDto.CurrentUserId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
+            RequestDto result = await _requestService.AddRequest(addRequestDto);
+            return Ok(result);
+        }
+
+        [HttpPost]
         [Route("price")]
         public async Task<IActionResult> GetRequestPrice([FromBody] AddRequestDto addRequestDto)
         {
-            //Don't forget to set request date
+            //UNCOMMENT for calulating real price
+
             addRequestDto.CurrentUserId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
-            decimal price = await _requestService.CalculateRequestPrice(addRequestDto);
-            return Ok(price);
+            //decimal price = await _requestService.CalculateRequestPrice(addRequestDto);
+            return Ok(10);
         }
     }
 }
