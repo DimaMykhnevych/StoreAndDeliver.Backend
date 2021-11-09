@@ -19,7 +19,7 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
         [Required]
         public decimal TotalSum { get; set; }
         public Guid FromAddressId { get; set; }
-        public Guid ToAddressId { get; set; }
+        public Guid? ToAddressId { get; set; }
         public Guid AppUserId { get; set; }
         public AddressDto FromAddress { get; set; }
         public AddressDto ToAddress { get; set; }

@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StoreAndDeliver.DataLayer.DbContext;
 
 namespace StoreAndDeliver.DataLayer.Migrations
 {
     [DbContext(typeof(StoreAndDeliverDbContext))]
-    partial class StoreAndDeliverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211109035443_addStoreIdToCargoRequest")]
+    partial class addStoreIdToCargoRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -406,7 +408,7 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Property<DateTime?>("StoreUntilDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("ToAddressId")
+                    b.Property<Guid>("ToAddressId")
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("TotalSum")
@@ -621,7 +623,8 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.HasOne("StoreAndDeliver.DataLayer.Models.Address", "ToAddress")
                         .WithMany("RequestsTo")
                         .HasForeignKey("ToAddressId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("AppUser");
 

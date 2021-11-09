@@ -20,7 +20,7 @@ namespace StoreAndDeliver.DataLayer.DbContext
         public DbSet<CargoSetting> CargoSettings { get; set; }
         public DbSet<EnvironmentSetting> EnvironmentSettings { get; set; }
         public DbSet<Carrier> Carriers { get; set; }
-        public DbSet<Shipping> Shippings { get; set; }
+        public DbSet<CargoSeesion> CargoSeesions { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<City> Cities { get; set; }
 

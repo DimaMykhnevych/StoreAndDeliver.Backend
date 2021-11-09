@@ -10,6 +10,7 @@ using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
+using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
 using StoreAndDeliver.DataLayer.Builders.CitiesQueryBuilder;
 using StoreAndDeliver.DataLayer.Repositories.AddressRepository;
@@ -18,6 +19,7 @@ using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
 using StoreAndDeliver.DataLayer.Repositories.CityRepository;
 using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
 using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
+using StoreAndDeliver.DataLayer.Repositories.StoreRepository;
 using StoreAndDeliver.DataLayer.Repositories.UserRepository;
 
 namespace StoreAndDeliver.Web.Installers
@@ -39,6 +41,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IRequestService, RequestService>();
             services.AddTransient<IConvertionService, ConvertionService>();
             services.AddTransient<ICargoService, CargoService>();
+            services.AddTransient<IStoreService, StoreService>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
@@ -54,6 +57,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IRequestRepository, RequestRepository>();
             services.AddTransient<ICargoRepository, CargoRepository>();
             services.AddTransient<ICargoRequestsRepository, CargoRequestsRepository>();
+            services.AddTransient<IStoreRepository, StoreRepository>();
         }
     }
 }

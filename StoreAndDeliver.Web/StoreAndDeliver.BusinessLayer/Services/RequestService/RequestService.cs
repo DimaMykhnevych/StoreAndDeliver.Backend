@@ -4,6 +4,7 @@ using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
+using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
@@ -22,20 +23,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         private readonly IConvertionService _convertionService;
         private readonly IAddressService _addressService;
         private readonly ICargoService _cargoService;
+        private readonly IStoreService _storeService;
         private readonly IMapper _mapper;
 
         public RequestService(IRequestRepository requestRepository,
-            ICargoRequestsRepository cargoRequestsRepository,
             IConvertionService convertionService,
             IAddressService addressService,
             ICargoService cargoService,
+            ICargoRequestsRepository cargoRequestsRepository,
+            IStoreService storeService,
             IMapper mapper)
         {
             _requestRepository = requestRepository;
-            _cargoRequestsRepository = cargoRequestsRepository;
             _convertionService = convertionService;
             _addressService = addressService;
             _cargoService = cargoService;
+            _cargoRequestsRepository = cargoRequestsRepository;
+            _storeService = storeService;
             _mapper = mapper;
         }
 
@@ -45,15 +49,19 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             //Adding addresses
             AddressDto addedFromAddress =
                 await _addressService.AddAddress(addRequestDto.Request.FromAddress);
-            AddressDto addedToAddress =
-                await _addressService.AddAddress(addRequestDto.Request.ToAddress);
+            AddressDto addedToAddress = new AddressDto();
+            if (addRequestDto.Request.Type != RequestType.Store)
+            {
+                addedToAddress =
+                    await _addressService.AddAddress(addRequestDto.Request.ToAddress);
+            }
 
             //Adding request
             Request request = _mapper.Map<Request>(addRequestDto.Request);
             request.Id = Guid.NewGuid();
             request.AppUserId = addRequestDto.CurrentUserId;
             request.FromAddressId = addedFromAddress.Id;
-            request.ToAddressId = addedToAddress.Id;
+            request.ToAddressId = addedToAddress.Id == Guid.Empty ? null : addedToAddress.Id;
             request.FromAddress = request.ToAddress = null;
             string fromCurrency = GetCurrencyUnit(addRequestDto.CurrentLanguage);
             request.TotalSum = await _convertionService.ConvertCurrency(fromCurrency, Currency.Usd, request.TotalSum);
@@ -62,20 +70,29 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
 
             //Adding cargo
             var cargo = await _cargoService.AddCargoRange(addRequestDto.Cargo, addRequestDto.Units);
+            var addedRequestDto = _mapper.Map<RequestDto>(request);
 
             //Adding CargoRequests
-            foreach (var c in cargo)
+            if (request.Type == RequestType.Store)
             {
-                var cargoRequest = new CargoRequest()
-                {
-                    Id = Guid.NewGuid(),
-                    CargoId = c.Id,
-                    RequestId = addedRequest.Id
-                };
-                await _cargoRequestsRepository.Insert(cargoRequest);
-                await _cargoRequestsRepository.Save();
+                await _storeService.DistrubuteCargoByStores(cargo, addedRequestDto);
             }
-            return _mapper.Map<RequestDto>(request);
+            else
+            {
+                foreach (var c in cargo)
+                {
+                    var cargoRequest = new CargoRequest()
+                    {
+                        Id = Guid.NewGuid(),
+                        CargoId = c.Id,
+                        RequestId = addedRequest.Id
+                    };
+                    await _cargoRequestsRepository.Insert(cargoRequest);
+                    await _cargoRequestsRepository.Save();
+                }
+            }
+
+            return addedRequestDto;
         }
 
         public async Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto)

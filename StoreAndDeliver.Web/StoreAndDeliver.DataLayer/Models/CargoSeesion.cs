@@ -2,7 +2,7 @@
 
 namespace StoreAndDeliver.DataLayer.Models
 {
-    public class Shipping
+    public class CargoSeesion
     {
         public Guid Id { get; set; }
         public Guid CarrierId { get; set; }

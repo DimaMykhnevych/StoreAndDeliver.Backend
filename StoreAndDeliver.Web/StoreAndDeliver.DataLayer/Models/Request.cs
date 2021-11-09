@@ -20,7 +20,7 @@ namespace StoreAndDeliver.DataLayer.Models
         [Required]
         public decimal TotalSum { get; set; }
         public Guid FromAddressId { get; set; }
-        public Guid ToAddressId { get; set; }
+        public Guid? ToAddressId { get; set; }
         public Guid AppUserId { get; set; }
         public AppUser AppUser { get; set; }
 

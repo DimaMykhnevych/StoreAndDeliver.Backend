@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StoreAndDeliver.DataLayer.DbContext;
 
 namespace StoreAndDeliver.DataLayer.Migrations
 {
     [DbContext(typeof(StoreAndDeliverDbContext))]
-    partial class StoreAndDeliverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211109034216_RenameShippingTable")]
+    partial class RenameShippingTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,16 +256,11 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Property<Guid>("RequestId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid?>("StoreId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CargoId");
 
                     b.HasIndex("RequestId");
-
-                    b.HasIndex("StoreId");
 
                     b.ToTable("CargoRequests");
                 });
@@ -406,7 +403,7 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Property<DateTime?>("StoreUntilDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid?>("ToAddressId")
+                    b.Property<Guid>("ToAddressId")
                         .HasColumnType("char(36)");
 
                     b.Property<decimal>("TotalSum")
@@ -544,15 +541,9 @@ namespace StoreAndDeliver.DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("StoreAndDeliver.DataLayer.Models.Store", "Store")
-                        .WithMany("CargoRequests")
-                        .HasForeignKey("StoreId");
-
                     b.Navigation("Cargo");
 
                     b.Navigation("Request");
-
-                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.CargoSeesion", b =>
@@ -621,7 +612,8 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.HasOne("StoreAndDeliver.DataLayer.Models.Address", "ToAddress")
                         .WithMany("RequestsTo")
                         .HasForeignKey("ToAddressId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
 
                     b.Navigation("AppUser");
 
@@ -680,11 +672,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
                 });
 
             modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Request", b =>
-                {
-                    b.Navigation("CargoRequests");
-                });
-
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.Store", b =>
                 {
                     b.Navigation("CargoRequests");
                 });

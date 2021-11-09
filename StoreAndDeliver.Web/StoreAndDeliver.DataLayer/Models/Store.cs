@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace StoreAndDeliver.DataLayer.Models
 {
@@ -10,5 +11,7 @@ namespace StoreAndDeliver.DataLayer.Models
         public double CurrentOccupiedVolume { get; set; }
         public Guid AddressId { get; set; }
         public Address Address { get; set; }
+        
+        public ICollection<CargoRequest> CargoRequests { get; set; }
     }
 }

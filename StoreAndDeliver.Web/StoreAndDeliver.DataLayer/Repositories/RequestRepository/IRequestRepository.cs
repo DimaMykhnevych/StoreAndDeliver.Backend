@@ -8,5 +8,6 @@ namespace StoreAndDeliver.DataLayer.Repositories.RequestRepository
     public interface IRequestRepository : IRepository<Request>
     {
         Task<IEnumerable<Request>> GetUserRequests(Guid userId);
+        Task<IEnumerable<Request>> GetOutdatedStoreRequests();
     }
 }

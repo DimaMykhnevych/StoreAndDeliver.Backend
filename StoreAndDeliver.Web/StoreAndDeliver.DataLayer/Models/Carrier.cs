@@ -12,6 +12,6 @@ namespace StoreAndDeliver.DataLayer.Models
 
         public Guid AppUserId { get; set; }
         public virtual AppUser AppUser { get; set; }
-        public ICollection<Shipping> Shippings { get; set; }
+        public ICollection<CargoSeesion> CargoSeesions { get; set; }
     }
 }
