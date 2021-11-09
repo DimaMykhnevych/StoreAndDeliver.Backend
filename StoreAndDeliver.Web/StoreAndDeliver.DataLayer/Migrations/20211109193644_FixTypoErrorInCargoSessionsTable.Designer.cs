@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StoreAndDeliver.DataLayer.DbContext;
 
 namespace StoreAndDeliver.DataLayer.Migrations
 {
     [DbContext(typeof(StoreAndDeliverDbContext))]
-    partial class StoreAndDeliverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211109193644_FixTypoErrorInCargoSessionsTable")]
+    partial class FixTypoErrorInCargoSessionsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,9 +401,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
 
                     b.Property<DateTime>("RequestDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("StoreFromDate")
                         .HasColumnType("datetime(6)");

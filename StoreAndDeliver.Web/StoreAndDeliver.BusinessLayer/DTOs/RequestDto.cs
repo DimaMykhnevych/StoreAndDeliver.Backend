@@ -1,5 +1,6 @@
 ﻿using StoreAndDeliver.DataLayer.Enums;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StoreAndDeliver.BusinessLayer.DTOs
@@ -14,6 +15,7 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
 
         [Required]
         public RequestType Type { get; set; }
+        public RequestStatus Status { get; set; }
         public bool IsSecurityModeEnabled { get; set; }
 
         [Required]
@@ -23,5 +25,6 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
         public Guid AppUserId { get; set; }
         public AddressDto FromAddress { get; set; }
         public AddressDto ToAddress { get; set; }
+        public ICollection<CargoRequestDto> CargoRequests { get; set; }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace StoreAndDeliver.DataLayer.Models
 {
@@ -13,7 +12,7 @@ namespace StoreAndDeliver.DataLayer.Models
         public Store Store { get; set; }
         public Cargo Cargo { get; set; }
         public Request Request { get; set; }
-        public ICollection<CargoSeesion> CargoSeesions { get; set; }
+        //public ICollection<CargoSeesionDto> CargoSeesions { get; set; }
 
     }
 }

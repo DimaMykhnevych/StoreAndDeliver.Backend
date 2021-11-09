@@ -15,6 +15,7 @@ namespace StoreAndDeliver.DataLayer.Models
 
         [Required]
         public RequestType Type {get; set; }
+        public RequestStatus Status { get; set; }
         public bool IsSecurityModeEnabled { get; set; }
 
         [Required]

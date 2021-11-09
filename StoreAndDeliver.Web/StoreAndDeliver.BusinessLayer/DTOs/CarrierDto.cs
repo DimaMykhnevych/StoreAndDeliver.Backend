@@ -1,9 +1,10 @@
-﻿using System;
+﻿using StoreAndDeliver.DataLayer.Models;
+using System;
 using System.Collections.Generic;
 
-namespace StoreAndDeliver.DataLayer.Models
+namespace StoreAndDeliver.BusinessLayer.DTOs
 {
-    public class Carrier
+    public class CarrierDto
     {
         public Guid Id { get; set; }
         public string CompanyName { get; set; }
@@ -12,6 +13,6 @@ namespace StoreAndDeliver.DataLayer.Models
 
         public Guid AppUserId { get; set; }
         public virtual AppUser AppUser { get; set; }
-        public ICollection<CargoSession> CargoSeesions { get; set; }
+        public ICollection<CargoSessionDto> CargoSeesions { get; set; }
     }
 }

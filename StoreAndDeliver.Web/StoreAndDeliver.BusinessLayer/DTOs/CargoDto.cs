@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StoreAndDeliver.DataLayer.Models;
+using System;
+using System.Collections.Generic;
 
 namespace StoreAndDeliver.BusinessLayer.DTOs
 {
@@ -11,5 +13,8 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
         public double Length { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
+
+        public ICollection<CargoRequestDto> CargoRequests { get; set; }
+        public ICollection<CargoSetting> CargoSettings { get; set; }
     }
 }

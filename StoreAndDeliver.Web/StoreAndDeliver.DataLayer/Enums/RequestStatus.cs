@@ -4,7 +4,8 @@
     {
         InProgress,
         Rejected,
-        Approved,
+        Completed,
+        Pending,
         Other = 100
     }
 }

@@ -3,6 +3,7 @@ using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
+using StoreAndDeliver.BusinessLayer.Services.CarrierService;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.DataLayer.Enums;
@@ -24,6 +25,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         private readonly IAddressService _addressService;
         private readonly ICargoService _cargoService;
         private readonly IStoreService _storeService;
+        private readonly ICarrierService _carrierService;
         private readonly IMapper _mapper;
 
         public RequestService(IRequestRepository requestRepository,
@@ -32,6 +34,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             ICargoService cargoService,
             ICargoRequestsRepository cargoRequestsRepository,
             IStoreService storeService,
+            ICarrierService carrierService,
             IMapper mapper)
         {
             _requestRepository = requestRepository;
@@ -40,7 +43,16 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             _cargoService = cargoService;
             _cargoRequestsRepository = cargoRequestsRepository;
             _storeService = storeService;
+            _carrierService = carrierService;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<RequestDto>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType)
+        {
+            CarrierDto carrier = await _carrierService.GetCarrier(currentCarrierId);
+            return null;
+            //Getting requests that have not yet been processed
+
         }
 
         public async Task<RequestDto> AddRequest(AddRequestDto addRequestDto)
