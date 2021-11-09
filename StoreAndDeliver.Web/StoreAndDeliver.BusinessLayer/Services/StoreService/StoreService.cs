@@ -62,7 +62,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
                 foreach(var r in cargoRequest.CargoRequests)
                 {
                     var cargoVolume = GetCargoVolume(r.Cargo);
-                    if (r.Store != null)
+                    if (r.Store != null && r.Store.CurrentOccupiedVolume > 0)
                     {
                         r.Store.CurrentOccupiedVolume -= cargoVolume;
                         await _storeRepository.Update(r.Store);
