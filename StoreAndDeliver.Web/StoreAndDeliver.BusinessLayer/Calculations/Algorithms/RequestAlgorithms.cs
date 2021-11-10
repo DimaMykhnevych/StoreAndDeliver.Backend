@@ -27,7 +27,8 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
             foreach (var combination in requestCombinations)
             {
                 var cargoDtos = _mapper.Map<IEnumerable<CargoDto>>(combination.Select(c => c.Cargo));
-                var settingBounds = _cargoService.GetCargoSettingsBound(cargoDtos);
+                var settingBounds = _cargoService
+                    .GetCargoSettingsBound(cargoDtos);
                 foreach (var cr in combination)
                 {
                     foreach (var setting in cr.Cargo.CargoSettings)
@@ -40,17 +41,19 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
                             break;
                         }
                     }
-                    if (!isCombinationInconsistency)
+                    if (isCombinationInconsistency)
                     {
                         break;
                     }
                 }
                 resultRequests.Add(combination);
             }
+            //TODO check if in combination is only one item and it is already in another combination, than skip it
+            //TODO check carrier capacity
             return resultRequests;
         }
 
-        private ICollection<ICollection<CargoRequest>> GetAllPossibleCargoRequestsCombinations(ICollection<CargoRequest> cargoRequests)
+        private static ICollection<ICollection<CargoRequest>> GetAllPossibleCargoRequestsCombinations(ICollection<CargoRequest> cargoRequests)
         {
             double count = Math.Pow(2, cargoRequests.Count);
             List<List<CargoRequest>> result = new List<List<CargoRequest>>();

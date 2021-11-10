@@ -2,10 +2,10 @@
 {
     public enum RequestStatus
     {
+        Pending,
         InProgress,
         Rejected,
         Completed,
-        Pending,
         Other = 100
     }
 }

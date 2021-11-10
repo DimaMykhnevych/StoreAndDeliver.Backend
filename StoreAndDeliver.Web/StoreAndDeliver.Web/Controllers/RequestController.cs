@@ -19,6 +19,15 @@ namespace StoreAndDeliver.Web.Controllers
             _requestService = requestService;
         }
 
+        [HttpGet]
+        [Route("optimizedRequests")]
+        public async Task<IActionResult> GetOptimizedRequestGroups()
+        {
+            var result = await _requestService.GetOptimizedRequestGroups
+                (new Guid("0044add8-b3ea-414b-8b72-1312f91dafd8"), DataLayer.Enums.RequestType.Deliver);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddRequest([FromBody] AddRequestDto addRequestDto)
         {

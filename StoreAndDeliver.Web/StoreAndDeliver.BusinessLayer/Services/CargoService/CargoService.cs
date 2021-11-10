@@ -60,19 +60,32 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
 
         public Dictionary<string, SettingsBoundDto> GetCargoSettingsBound(IEnumerable<CargoDto> cargos)
         {
-            var cargoSettings = cargos.SelectMany(c => c.CargoSettings);
+            var cargoSettings = cargos.SelectMany(c => c.CargoSettings).ToList();
             Dictionary<string, SettingsBoundDto> result = new();
             var temperature = GetCargoSettingsBySettingName(cargoSettings, SettingsConstants.TEMPERATURE);
             var luminosity = GetCargoSettingsBySettingName(cargoSettings, SettingsConstants.LUMINOSITY);
             var humidity = GetCargoSettingsBySettingName(cargoSettings, SettingsConstants.HUMIDITY);
-            result.Add(SettingsConstants.TEMPERATURE, SettingsBoundFactory(temperature));
-            result.Add(SettingsConstants.LUMINOSITY, SettingsBoundFactory(luminosity));
-            result.Add(SettingsConstants.HUMIDITY, SettingsBoundFactory(humidity));
+            if (temperature.Any())
+            {
+                result.Add(SettingsConstants.TEMPERATURE, SettingsBoundFactory(temperature));
+            }
+            if (luminosity.Any())
+            {
+                result.Add(SettingsConstants.LUMINOSITY, SettingsBoundFactory(luminosity));
+            }
+            if (humidity.Any())
+            {
+                result.Add(SettingsConstants.HUMIDITY, SettingsBoundFactory(humidity));
+            }
             return result;
         }
 
         private static SettingsBoundDto SettingsBoundFactory(IEnumerable<CargoSetting> cargoSettings)
         {
+            if (!cargoSettings.Any())
+            {
+                return null;
+            }
             double minVal = cargoSettings.Select(t => t.MinValue).Max();
             double maxVal = cargoSettings.Select(t => t.MaxValue).Min();
             return new SettingsBoundDto { MinValue = minVal, MaxValue = maxVal };
