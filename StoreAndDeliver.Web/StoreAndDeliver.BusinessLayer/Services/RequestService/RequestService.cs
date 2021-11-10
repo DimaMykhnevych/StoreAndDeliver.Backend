@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using StoreAndDeliver.BusinessLayer.Calculations.Algorithms;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
@@ -6,6 +7,7 @@ using StoreAndDeliver.BusinessLayer.Services.CargoService;
 using StoreAndDeliver.BusinessLayer.Services.CarrierService;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
+using StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder;
 using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
@@ -26,6 +28,8 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         private readonly ICargoService _cargoService;
         private readonly IStoreService _storeService;
         private readonly ICarrierService _carrierService;
+        private readonly IRequestQueryBuilder _requestQueryBuilder;
+        private readonly IRequestAlgorithms _requestAlgorithms;
         private readonly IMapper _mapper;
 
         public RequestService(IRequestRepository requestRepository,
@@ -35,6 +39,8 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             ICargoRequestsRepository cargoRequestsRepository,
             IStoreService storeService,
             ICarrierService carrierService,
+            IRequestQueryBuilder requestQueryBuilder,
+            IRequestAlgorithms requestAlgorithms,
             IMapper mapper)
         {
             _requestRepository = requestRepository;
@@ -44,15 +50,35 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             _cargoRequestsRepository = cargoRequestsRepository;
             _storeService = storeService;
             _carrierService = carrierService;
+            _requestQueryBuilder = requestQueryBuilder;
+            _requestAlgorithms = requestAlgorithms;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<RequestDto>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType)
+        public async Task<List<ICollection<CargoRequest>>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType)
         {
             CarrierDto carrier = await _carrierService.GetCarrier(currentCarrierId);
-            return null;
-            //Getting requests that have not yet been processed
 
+            //Getting requests with specific type that have not yet been processed
+            List<Request> requests = new();
+            var baseRequestInfo = _requestQueryBuilder
+                .SetBaseRequestInfo()
+                .SetRequestType(requestType);
+            var optimizedCargoRequests = new List<ICollection<CargoRequest>>();
+            if (requestType == RequestType.Deliver)
+            {
+                requests = baseRequestInfo
+                    .SetCarryOutBeforeDate(DateTime.Now.AddHours(-5))
+                    .SortByDeliverByDate()
+                    .Build()
+                    .ToList();
+                List<CargoRequest> cargoRequests = requests
+                    .SelectMany(r => r.CargoRequests)
+                    .Where(cr => cr.Status == RequestStatus.Pending).ToList();
+                //reaquests grouped by all applicable combinations of setting values
+                optimizedCargoRequests = OptimizeDeliverRequests(carrier, cargoRequests).ToList();
+            }
+            return optimizedCargoRequests;
         }
 
         public async Task<RequestDto> AddRequest(AddRequestDto addRequestDto)
@@ -122,6 +148,12 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             }
 
             return sum;
+        }
+
+        private ICollection<ICollection<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, List<CargoRequest> cargoRequests)
+        {
+            var optimizedRequests = _requestAlgorithms.GetOptimizedRequests(cargoRequests);
+            return optimizedRequests;
         }
 
         private async Task<decimal> CalculateBonusForUser(Guid id)

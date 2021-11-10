@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StoreAndDeliver.DataLayer.DbContext;
 
 namespace StoreAndDeliver.DataLayer.Migrations
 {
     [DbContext(typeof(StoreAndDeliverDbContext))]
-    partial class StoreAndDeliverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211110045808_RemoveRequestStatusFromRequestTableToCargoRequest")]
+    partial class RemoveRequestStatusFromRequestTableToCargoRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

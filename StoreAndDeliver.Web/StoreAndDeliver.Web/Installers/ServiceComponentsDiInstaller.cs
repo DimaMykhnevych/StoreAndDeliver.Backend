@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StoreAndDeliver.BusinessLayer.Calculations.Algorithms;
 using StoreAndDeliver.BusinessLayer.Clients.ExchangerApiClient;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
@@ -46,6 +47,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICargoService, CargoService>();
             services.AddTransient<IStoreService, StoreService>();
             services.AddTransient<ICarrierService, CarrierService>();
+            services.AddTransient<IRequestAlgorithms, RequestAlgorithms>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();

@@ -20,7 +20,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
         private readonly IEnvironmnetSettingService _environmnetSettingService;
         private readonly IMapper _mapper;
 
-        public CargoService(ICargoRepository cargoRepository, 
+        public CargoService(ICargoRepository cargoRepository,
             IConvertionService convertionService,
             IEnvironmnetSettingService environmnetSettingService,
             IMapper mapper)
@@ -35,7 +35,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
         {
             Cargo cargo = _mapper.Map<Cargo>(addCargoDto);
             Cargo existingCargo = await _cargoRepository.Get(cargo.Id);
-            if(existingCargo != null)
+            if (existingCargo != null)
             {
                 return _mapper.Map<CargoDto>(existingCargo);
             }
@@ -50,12 +50,38 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
         public async Task<IEnumerable<CargoDto>> AddCargoRange(IEnumerable<AddCargoDto> addCargoDtos, Units units)
         {
             List<CargoDto> addedCargo = new();
-            foreach(var c in addCargoDtos)
+            foreach (var c in addCargoDtos)
             {
                 CargoDto added = await AddCargo(c, units);
                 addedCargo.Add(added);
             }
             return addedCargo;
+        }
+
+        public Dictionary<string, SettingsBoundDto> GetCargoSettingsBound(IEnumerable<CargoDto> cargos)
+        {
+            var cargoSettings = cargos.SelectMany(c => c.CargoSettings);
+            Dictionary<string, SettingsBoundDto> result = new();
+            var temperature = GetCargoSettingsBySettingName(cargoSettings, SettingsConstants.TEMPERATURE);
+            var luminosity = GetCargoSettingsBySettingName(cargoSettings, SettingsConstants.LUMINOSITY);
+            var humidity = GetCargoSettingsBySettingName(cargoSettings, SettingsConstants.HUMIDITY);
+            result.Add(SettingsConstants.TEMPERATURE, SettingsBoundFactory(temperature));
+            result.Add(SettingsConstants.LUMINOSITY, SettingsBoundFactory(luminosity));
+            result.Add(SettingsConstants.HUMIDITY, SettingsBoundFactory(humidity));
+            return result;
+        }
+
+        private static SettingsBoundDto SettingsBoundFactory(IEnumerable<CargoSetting> cargoSettings)
+        {
+            double minVal = cargoSettings.Select(t => t.MinValue).Max();
+            double maxVal = cargoSettings.Select(t => t.MaxValue).Min();
+            return new SettingsBoundDto { MinValue = minVal, MaxValue = maxVal };
+        }
+
+        private static IEnumerable<CargoSetting> GetCargoSettingsBySettingName(
+            IEnumerable<CargoSetting> cargoSettings, string name)
+        {
+            return cargoSettings.Where(c => c.EnvironmentSetting.Name == name);
         }
 
         private async Task ConvertCargoSettings(IEnumerable<CargoSetting> cargoSettingDtos, Units units)

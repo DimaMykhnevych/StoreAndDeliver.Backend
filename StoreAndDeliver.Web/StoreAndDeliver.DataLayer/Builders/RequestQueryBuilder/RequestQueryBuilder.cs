@@ -2,6 +2,7 @@
 using StoreAndDeliver.DataLayer.DbContext;
 using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
+using System;
 using System.Linq;
 
 namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
@@ -29,6 +30,7 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
                 .Include(r => r.CargoRequests)
                 .ThenInclude(cr => cr.Cargo)
                 .ThenInclude(cr => cr.CargoSettings)
+                .ThenInclude(cs => cs.EnvironmentSetting)
                 .Include(r => r.CargoRequests)
                 .ThenInclude(cr => cr.Store)
                 .AsNoTracking();
@@ -36,19 +38,39 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
             return this;
         }
 
-        public IRequestQueryBuilder SetCarryOutBeforeDate()
+        public IRequestQueryBuilder SetCarryOutBeforeDate(DateTime? time)
         {
-            throw new System.NotImplementedException();
+            if(time != null)
+            {
+                _query = _query.Where(r => r.CarryOutBefore >= time);
+            }
+            return this;
         }
 
-        public IRequestQueryBuilder SetStoreUntilDate()
+        public IRequestQueryBuilder SetStoreDates(DateTime? storeFrom, DateTime? storeUntil)
         {
-            throw new System.NotImplementedException();
+            if (storeFrom == null && storeUntil != null)
+            {
+                _query = _query.Where(tp => tp.StoreUntilDate <= storeUntil);
+            }
+            else if (storeUntil == null && storeFrom != null)
+            {
+                _query = _query.Where(tp => tp.StoreFromDate >= storeFrom);
+            }
+            else if (storeFrom != null && storeUntil != null)
+            {
+                _query = _query.Where(tp => tp.StoreFromDate >= storeFrom
+                && tp.StoreUntilDate <= storeUntil);
+            }
+            return this;
         }
 
-        public IRequestQueryBuilder SetRequestType(RequestType type)
+        public IRequestQueryBuilder SetRequestType(RequestType? type)
         {
-            _query = _query.Where(r => r.Type == type);
+            if (type != null)
+            {
+                _query = _query.Where(r => r.Type == type);
+            }
             return this;
         }
 
@@ -57,5 +79,11 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
             _query = _query.OrderBy(r => r.CarryOutBefore);
             return this;
         }
+
+        //public IRequestQueryBuilder SetRequestStatus(RequestStatus status)
+        //{
+        //    _query = _query.Where(r => r.CargoRequests == status);
+        //    return this;
+        //}
     }
 }
