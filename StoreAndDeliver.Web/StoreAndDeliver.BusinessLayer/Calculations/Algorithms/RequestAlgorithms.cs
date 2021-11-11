@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GeoCoordinatePortable;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
 using StoreAndDeliver.DataLayer.Models;
@@ -17,6 +18,17 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
         {
             _cargoService = cargoService;
             _mapper = mapper;
+        }
+
+        public List<List<CargoRequest>> GetOptimizedRouteForCargoRequestGroups(ICollection<ICollection<CargoRequest>> cargoRequests)
+        {
+            List<List<CargoRequest>> cargoOprimizedByDistance = new List<List<CargoRequest>>();
+            foreach(var group in cargoRequests)
+            {
+                var optimizedGroup = CalculateOptimalRouteForCargoRequests(group.ToList());
+                cargoOprimizedByDistance.Add(optimizedGroup);
+            }
+            return cargoOprimizedByDistance;
         }
 
         public ICollection<ICollection<CargoRequest>> GetOptimizedRequests(ICollection<CargoRequest> cargoRequests)
@@ -48,9 +60,50 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
                 }
                 resultRequests.Add(combination);
             }
-            //TODO check if in combination is only one item and it is already in another combination, than skip it
-            //TODO check carrier capacity
+
+            // Check if in combination is only one item and it is already in another combination, than skip it
+            for(int i = 0; i < resultRequests.Count; i++)
+            {
+                if(resultRequests[i].Count == 1 
+                    && resultRequests
+                    .Where(r => 
+                        r.Where(cr => cr.Id == resultRequests[i].First().Id)
+                         .Any())
+                    .Count() > 1)
+                {
+                    resultRequests.Remove(resultRequests[i]);
+                    i--;
+                }
+            }
             return resultRequests;
+        }
+
+        private List<CargoRequest> CalculateOptimalRouteForCargoRequests(List<CargoRequest> cargoRequests)
+        {
+            List<CargoRequest> result = new();
+            result.Add(cargoRequests[0]);
+            cargoRequests.Remove(cargoRequests[0]);
+            CargoRequest nextCargoRequest = new();
+            for (int i = 0; i < cargoRequests.Count; i++)
+            {
+                var previousToAddress = new GeoCoordinate
+                    (result[i].Request.ToAddress.Latitude, result[i].Request.ToAddress.Longtitude);
+                double minDistance = Double.MaxValue;
+                for (int j = 0; j < cargoRequests.Count; j++)
+                {
+                    var nextFromAddress = new GeoCoordinate
+                        (cargoRequests[j].Request.FromAddress.Latitude, cargoRequests[j].Request.FromAddress.Longtitude);
+                    var distance = previousToAddress.GetDistanceTo(nextFromAddress);
+                    if(distance < minDistance)
+                    {
+                        minDistance = distance;
+                        nextCargoRequest = cargoRequests[j];
+                    }
+                }
+                result.Add(nextCargoRequest);
+                cargoRequests.Remove(nextCargoRequest);
+            }
+            return result;
         }
 
         private static ICollection<ICollection<CargoRequest>> GetAllPossibleCargoRequestsCombinations(ICollection<CargoRequest> cargoRequests)

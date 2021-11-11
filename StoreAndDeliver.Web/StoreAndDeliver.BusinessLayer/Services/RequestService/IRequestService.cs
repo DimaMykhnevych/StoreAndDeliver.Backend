@@ -9,7 +9,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
 {
     public interface IRequestService
     {
-        Task<List<ICollection<CargoRequest>>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType);
+        Task<List<List<CargoRequest>>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType);
         Task<RequestDto> AddRequest(AddRequestDto addRequestDto);
         Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto);
     }

@@ -81,10 +81,9 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
             {
                 foreach(var r in cargoRequest.CargoRequests)
                 {
-                    var cargoVolume = GetCargoVolume(r.Cargo);
                     if (r.Store != null && r.Store.CurrentOccupiedVolume > 0)
                     {
-                        r.Store.CurrentOccupiedVolume -= cargoVolume;
+                        r.Store.CurrentOccupiedVolume -= r.Cargo.GetCargoVolume();
                         await _storeRepository.Update(r.Store);
                     }
                 }
@@ -107,11 +106,6 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
                 }
             }
             return stores.FirstOrDefault(s => s.Id == optimalStoreId);
-        }
-
-        private static double GetCargoVolume(Cargo c)
-        {
-            return (c.Height * c.Length * c.Width) * c.Amount;
         }
 
         private static double GetCargoVolume(CargoDto c)

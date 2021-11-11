@@ -55,7 +55,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             _mapper = mapper;
         }
 
-        public async Task<List<ICollection<CargoRequest>>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType)
+        public async Task<List<List<CargoRequest>>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType)
         {
             CarrierDto carrier = await _carrierService.GetCarrier(currentCarrierId);
 
@@ -64,7 +64,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             var baseRequestInfo = _requestQueryBuilder
                 .SetBaseRequestInfo()
                 .SetRequestType(requestType);
-            var optimizedCargoRequests = new List<ICollection<CargoRequest>>();
+            var optimizedCargoRequests = new List<List<CargoRequest>>();
             if (requestType == RequestType.Deliver)
             {
                 requests = baseRequestInfo
@@ -150,10 +150,27 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             return sum;
         }
 
-        private ICollection<ICollection<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, List<CargoRequest> cargoRequests)
+        private List<List<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, List<CargoRequest> cargoRequests)
         {
             var optimizedRequests = _requestAlgorithms.GetOptimizedRequests(cargoRequests);
-            return optimizedRequests;
+            var requestsOptimizedByRoute = _requestAlgorithms.GetOptimizedRouteForCargoRequestGroups(optimizedRequests);
+            // Check carrier capacity.
+            double currentCapacity = 0;
+            var requestsToProceedByCurrentCarrier = new List<List<CargoRequest>>();
+            foreach (var optimizedRequest in requestsOptimizedByRoute)
+            {
+                foreach(var request in optimizedRequest)
+                {
+                    currentCapacity += request.Cargo.GetCargoVolume();
+                }
+                if(currentCapacity < carrier.MaxCargoVolume)
+                {
+                    requestsToProceedByCurrentCarrier.Add(optimizedRequest);
+                }
+                currentCapacity = 0;
+            }
+
+            return requestsToProceedByCurrentCarrier;
         }
 
         private async Task<decimal> CalculateBonusForUser(Guid id)

@@ -14,5 +14,11 @@ namespace StoreAndDeliver.DataLayer.Models
         public double Height { get; set; }
         public ICollection<CargoRequest> CargoRequests { get; set; }
         public ICollection<CargoSetting> CargoSettings { get; set; }
+
+        public double GetCargoVolume()
+        {
+            return (Length * Width * Height) * Amount;
+        }
+
     }
 }

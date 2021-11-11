@@ -27,6 +27,8 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
         public IRequestQueryBuilder SetBaseRequestInfo()
         {
             _query = _dbContext.Requests
+                .Include(r => r.FromAddress)
+                .Include(r => r.ToAddress)
                 .Include(r => r.CargoRequests)
                 .ThenInclude(cr => cr.Cargo)
                 .ThenInclude(cr => cr.CargoSettings)
