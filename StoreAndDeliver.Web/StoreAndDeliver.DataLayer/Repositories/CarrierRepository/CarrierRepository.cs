@@ -16,5 +16,10 @@ namespace StoreAndDeliver.DataLayer.Repositories.CarrierRepository
         {
             return await context.Carriers.FirstOrDefaultAsync(c => c.Id == id);
         }
+
+        public async Task<Carrier> GetCarrierByAppUserId(Guid id)
+        {
+            return await context.Carriers.FirstOrDefaultAsync(c => c.AppUserId == id);
+        }
     }
 }

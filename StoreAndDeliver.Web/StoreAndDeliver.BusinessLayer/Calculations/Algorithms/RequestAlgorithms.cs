@@ -20,7 +20,7 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
             _mapper = mapper;
         }
 
-        public List<List<CargoRequest>> GetOptimizedRouteForCargoRequestGroups(ICollection<ICollection<CargoRequest>> cargoRequests)
+        public List<List<CargoRequest>> GetOptimizedRouteForCargoRequestGroups(List<List<CargoRequest>> cargoRequests)
         {
             List<List<CargoRequest>> cargoOprimizedByDistance = new List<List<CargoRequest>>();
             foreach(var group in cargoRequests)
@@ -31,10 +31,10 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
             return cargoOprimizedByDistance;
         }
 
-        public ICollection<ICollection<CargoRequest>> GetOptimizedRequests(ICollection<CargoRequest> cargoRequests)
+        public List<List<CargoRequest>> GetOptimizedRequests(ICollection<CargoRequest> cargoRequests)
         {
             var requestCombinations = GetAllPossibleCargoRequestsCombinations(cargoRequests);
-            var resultRequests = new List<ICollection<CargoRequest>>();
+            var resultRequests = new List<List<CargoRequest>>();
             bool isCombinationInconsistency = false;
             foreach (var combination in requestCombinations)
             {
@@ -61,21 +61,34 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
                 resultRequests.Add(combination);
             }
 
-            // Check if in combination is only one item and it is already in another combination, than skip it
-            for(int i = 0; i < resultRequests.Count; i++)
+            // Check if combination is already in another combination, than skip it
+            RemoveRepitedCombinations(resultRequests);
+            return resultRequests;
+        }
+
+        private void RemoveRepitedCombinations(List<List<CargoRequest>> cargoRequests)
+        {
+            int countOfDuplicatedRequests = 0;
+            for (int i = 0; i < cargoRequests.Count; i++)
             {
-                if(resultRequests[i].Count == 1 
-                    && resultRequests
-                    .Where(r => 
-                        r.Where(cr => cr.Id == resultRequests[i].First().Id)
-                         .Any())
-                    .Count() > 1)
+                countOfDuplicatedRequests = 0;
+                for (int j = 0; j < cargoRequests[i].Count; j++)
                 {
-                    resultRequests.Remove(resultRequests[i]);
+                    if(cargoRequests
+                        .Where(r =>
+                            r.Where(cr => cr.Id == cargoRequests[i][j].Id)
+                            .Any())
+                        .Count() > 1)
+                    {
+                        countOfDuplicatedRequests++;
+                    }
+                }
+                if(countOfDuplicatedRequests == cargoRequests[i].Count)
+                {
+                    cargoRequests.Remove(cargoRequests[i]);
                     i--;
                 }
             }
-            return resultRequests;
         }
 
         private List<CargoRequest> CalculateOptimalRouteForCargoRequests(List<CargoRequest> cargoRequests)
@@ -84,7 +97,8 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
             result.Add(cargoRequests[0]);
             cargoRequests.Remove(cargoRequests[0]);
             CargoRequest nextCargoRequest = new();
-            for (int i = 0; i < cargoRequests.Count; i++)
+            int initialCargoCount = cargoRequests.Count;
+            for (int i = 0; i < initialCargoCount; i++)
             {
                 var previousToAddress = new GeoCoordinate
                     (result[i].Request.ToAddress.Latitude, result[i].Request.ToAddress.Longtitude);
@@ -106,7 +120,7 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
             return result;
         }
 
-        private static ICollection<ICollection<CargoRequest>> GetAllPossibleCargoRequestsCombinations(ICollection<CargoRequest> cargoRequests)
+        private static List<List<CargoRequest>> GetAllPossibleCargoRequestsCombinations(ICollection<CargoRequest> cargoRequests)
         {
             double count = Math.Pow(2, cargoRequests.Count);
             List<List<CargoRequest>> result = new List<List<CargoRequest>>();
@@ -123,7 +137,7 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
                     }
                 }
             }
-            return result.ToArray();
+            return result;
         }
     }
 }

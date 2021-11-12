@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
+using StoreAndDeliver.DataLayer.Models;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -10,6 +12,7 @@ namespace StoreAndDeliver.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RequestController : ControllerBase
     {
         private readonly IRequestService _requestService;
@@ -21,10 +24,12 @@ namespace StoreAndDeliver.Web.Controllers
 
         [HttpGet]
         [Route("optimizedRequests")]
+        [Authorize(Roles = Role.Carrier)]
         public async Task<IActionResult> GetOptimizedRequestGroups()
         {
+            Guid carrierId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
             var result = await _requestService.GetOptimizedRequestGroups
-                (new Guid("0044add8-b3ea-414b-8b72-1312f91dafd8"), DataLayer.Enums.RequestType.Deliver);
+                (carrierId, DataLayer.Enums.RequestType.Deliver);
             return Ok(result);
         }
 

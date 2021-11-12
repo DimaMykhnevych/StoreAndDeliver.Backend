@@ -5,7 +5,7 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
 {
     public interface IRequestAlgorithms
     {
-        List<List<CargoRequest>> GetOptimizedRouteForCargoRequestGroups(ICollection<ICollection<CargoRequest>> cargoRequests);
-        ICollection<ICollection<CargoRequest>> GetOptimizedRequests(ICollection<CargoRequest> cargoRequests);
+        List<List<CargoRequest>> GetOptimizedRouteForCargoRequestGroups(List<List<CargoRequest>> cargoRequests);
+        List<List<CargoRequest>> GetOptimizedRequests(ICollection<CargoRequest> cargoRequests);
     }
 }

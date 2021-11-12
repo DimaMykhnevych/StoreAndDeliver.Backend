@@ -55,9 +55,10 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             _mapper = mapper;
         }
 
-        public async Task<List<List<CargoRequest>>> GetOptimizedRequestGroups(Guid currentCarrierId, RequestType requestType)
+        public async Task<List<Dictionary<Guid, List<CargoRequest>>>> GetOptimizedRequestGroups
+            (Guid currentCarrierId, RequestType requestType)
         {
-            CarrierDto carrier = await _carrierService.GetCarrier(currentCarrierId);
+            CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(currentCarrierId);
 
             //Getting requests with specific type that have not yet been processed
             List<Request> requests = new();
@@ -75,10 +76,12 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 List<CargoRequest> cargoRequests = requests
                     .SelectMany(r => r.CargoRequests)
                     .Where(cr => cr.Status == RequestStatus.Pending).ToList();
-                //reaquests grouped by all applicable combinations of setting values
+
+                //Requests grouped by all applicable combinations of setting values
                 optimizedCargoRequests = OptimizeDeliverRequests(carrier, cargoRequests).ToList();
             }
-            return optimizedCargoRequests;
+            var groupedOptimizedRequests = GroupCargoRequestsByRequests(optimizedCargoRequests);
+            return groupedOptimizedRequests;
         }
 
         public async Task<RequestDto> AddRequest(AddRequestDto addRequestDto)
@@ -148,6 +151,19 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             }
 
             return sum;
+        }
+
+        private List<Dictionary<Guid, List<CargoRequest>>> GroupCargoRequestsByRequests
+            (List<List<CargoRequest>> cargoRequests)
+        {
+            List<Dictionary<Guid, List<CargoRequest>>> result = new();
+            foreach(var cr in cargoRequests)
+            {
+                Dictionary<Guid, List<CargoRequest>> groupedRequests = cr.GroupBy(c => c.RequestId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                result.Add(groupedRequests);
+            }
+            return result;
         }
 
         private List<List<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, List<CargoRequest> cargoRequests)
