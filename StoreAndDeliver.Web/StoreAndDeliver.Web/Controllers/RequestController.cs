@@ -22,14 +22,15 @@ namespace StoreAndDeliver.Web.Controllers
             _requestService = requestService;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("optimizedRequests")]
         [Authorize(Roles = Role.Carrier)]
-        public async Task<IActionResult> GetOptimizedRequestGroups()
+        public async Task<IActionResult> GetOptimizedRequestGroups([FromBody] GetOptimizedRequestDto getOptimizedRequestDto)
         {
+            //TODO uncomment in _requestService.ConvertRequestsValues for real currency converting
             Guid carrierId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
             var result = await _requestService.GetOptimizedRequestGroups
-                (carrierId, DataLayer.Enums.RequestType.Deliver);
+                (carrierId, getOptimizedRequestDto);
             return Ok(result);
         }
 

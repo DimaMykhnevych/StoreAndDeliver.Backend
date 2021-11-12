@@ -41,13 +41,15 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
                 var cargoDtos = _mapper.Map<IEnumerable<CargoDto>>(combination.Select(c => c.Cargo));
                 var settingBounds = _cargoService
                     .GetCargoSettingsBound(cargoDtos);
+                isCombinationInconsistency = false;
                 foreach (var cr in combination)
                 {
                     foreach (var setting in cr.Cargo.CargoSettings)
                     {
                         var minBoundValue = settingBounds[setting.EnvironmentSetting.Name].MinValue;
                         var maxBoundValue = settingBounds[setting.EnvironmentSetting.Name].MaxValue;
-                        if (!(minBoundValue >= setting.MinValue && maxBoundValue <= setting.MaxValue))
+                        if (!(minBoundValue >= setting.MinValue 
+                            && maxBoundValue <= setting.MaxValue) || minBoundValue > maxBoundValue)
                         {
                             isCombinationInconsistency = true;
                             break;
@@ -58,7 +60,10 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms
                         break;
                     }
                 }
-                resultRequests.Add(combination);
+                if (!isCombinationInconsistency)
+                {
+                    resultRequests.Add(combination);
+                }
             }
 
             // Check if combination is already in another combination, than skip it

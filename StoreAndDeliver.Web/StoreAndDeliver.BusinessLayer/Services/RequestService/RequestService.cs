@@ -56,7 +56,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         }
 
         public async Task<List<Dictionary<Guid, List<CargoRequest>>>> GetOptimizedRequestGroups
-            (Guid currentCarrierId, RequestType requestType)
+            (Guid currentCarrierId, GetOptimizedRequestDto getOptimizedRequestDto)
         {
             CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(currentCarrierId);
 
@@ -64,9 +64,9 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             List<Request> requests = new();
             var baseRequestInfo = _requestQueryBuilder
                 .SetBaseRequestInfo()
-                .SetRequestType(requestType);
+                .SetRequestType(getOptimizedRequestDto.RequestType);
             var optimizedCargoRequests = new List<List<CargoRequest>>();
-            if (requestType == RequestType.Deliver)
+            if (getOptimizedRequestDto.RequestType == RequestType.Deliver)
             {
                 requests = baseRequestInfo
                     .SetCarryOutBeforeDate(DateTime.Now.AddHours(-5))
@@ -81,6 +81,9 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 optimizedCargoRequests = OptimizeDeliverRequests(carrier, cargoRequests).ToList();
             }
             var groupedOptimizedRequests = GroupCargoRequestsByRequests(optimizedCargoRequests);
+            await ConvertRequestsValues(groupedOptimizedRequests, 
+                getOptimizedRequestDto.Units, 
+                getOptimizedRequestDto.CurrentLanguage);
             return groupedOptimizedRequests;
         }
 
@@ -164,6 +167,39 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 result.Add(groupedRequests);
             }
             return result;
+        }
+
+        private async Task ConvertRequestsValues
+            (List<Dictionary<Guid, List<CargoRequest>>> requestGroups, Units unitsTo, string currentLanguage)
+        {
+            Units unitsFrom = new Units()
+            {
+                Weight = WeightUnit.Kilograms,
+                Length = LengthUnit.Meters,
+                Temperature = TemperatureUnit.Celsius,
+                Luminosity = LuminosityUnit.Lux,
+                Humidity = HumidityUnit.Percentage
+            };
+            foreach(var group in requestGroups)
+            {
+                foreach(var keyValue in group)
+                {
+                    foreach(var value in keyValue.Value)
+                    {
+                        _cargoService.ConvertCargoUnits(value.Cargo, unitsFrom, unitsTo);
+                        await _cargoService.ConvertCargoSettings(value.Cargo.CargoSettings, unitsFrom, unitsTo);
+                    }
+
+                    // Converting currency
+                    // UNCOMMENT to real currency convertion
+                    //if(currentLanguage != Languages.ENGLISH)
+                    //{
+                    //    string toCurrency = GetCurrencyUnit(currentLanguage);
+                    //    decimal price = await _convertionService.ConvertCurrency(Currency.Usd, toCurrency, keyValue.Value[0].Request.TotalSum);
+                    //    keyValue.Value[0].Request.TotalSum = price;
+                    //}
+                }
+            }
         }
 
         private List<List<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, List<CargoRequest> cargoRequests)

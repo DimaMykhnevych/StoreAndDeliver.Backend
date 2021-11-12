@@ -39,8 +39,20 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
             {
                 return _mapper.Map<CargoDto>(existingCargo);
             }
-            ConvertCargoUnits(cargo, units);
-            await ConvertCargoSettings(cargo.CargoSettings, units);
+            var unitsTo = new Units()
+            {
+                Weight = WeightUnit.Kilograms, 
+                Length = LengthUnit.Meters,
+                Temperature = TemperatureUnit.Celsius,
+                Luminosity = LuminosityUnit.Lux,
+                Humidity = HumidityUnit.Percentage
+            };
+            ConvertCargoUnits(cargo, units, unitsTo);
+            foreach(var setting in cargo.CargoSettings)
+            {
+                setting.Id = Guid.NewGuid();
+            }
+            await ConvertCargoSettings(cargo.CargoSettings, units, unitsTo);
             cargo.Id = Guid.NewGuid();
             Cargo addedCargo = await _cargoRepository.Insert(cargo);
             await _cargoRepository.Save();
@@ -80,6 +92,32 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
             return result;
         }
 
+
+        public void ConvertCargoUnits(Cargo cargo, Units unitsFrom, Units unitsTo)
+        {
+            cargo.Height = _convertionService.ConvertLength(unitsFrom.Length, unitsTo.Length, cargo.Height);
+            cargo.Width = _convertionService.ConvertLength(unitsFrom.Length, unitsTo.Length, cargo.Width);
+            cargo.Length = _convertionService.ConvertLength(unitsFrom.Length, unitsTo.Length, cargo.Length);
+            cargo.Weight = _convertionService.ConvertWeigth(unitsFrom.Weight, unitsTo.Weight, cargo.Weight);
+        }
+
+        public async Task ConvertCargoSettings(IEnumerable<CargoSetting> cargoSettingDtos,
+            Units unitsFrom, Units unitsTo)
+        {
+            var envSettings = (await _environmnetSettingService.GetEnvironmentSettings()).ToList();
+            var temperatureId = envSettings.FirstOrDefault(s => s.Name == SettingsConstants.TEMPERATURE).Id;
+            foreach (var setting in cargoSettingDtos)
+            {
+                if (setting.EnvironmentSettingId == temperatureId)
+                {
+                    setting.MaxValue = _convertionService
+                        .ConvertTemperature(unitsFrom.Temperature, unitsTo.Temperature, setting.MaxValue);
+                    setting.MinValue = _convertionService
+                        .ConvertTemperature(unitsFrom.Temperature, unitsTo.Temperature, setting.MinValue);
+                }
+            }
+        }
+
         private static SettingsBoundDto SettingsBoundFactory(IEnumerable<CargoSetting> cargoSettings)
         {
             if (!cargoSettings.Any())
@@ -97,29 +135,5 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
             return cargoSettings.Where(c => c.EnvironmentSetting.Name == name);
         }
 
-        private async Task ConvertCargoSettings(IEnumerable<CargoSetting> cargoSettingDtos, Units units)
-        {
-            var envSettings = (await _environmnetSettingService.GetEnvironmentSettings()).ToList();
-            var temperatureId = envSettings.FirstOrDefault(s => s.Name == SettingsConstants.TEMPERATURE).Id;
-            foreach (var setting in cargoSettingDtos)
-            {
-                setting.Id = Guid.NewGuid();
-                if (setting.EnvironmentSettingId == temperatureId)
-                {
-                    setting.MaxValue = _convertionService
-                        .ConvertTemperature(units.Temperature, TemperatureUnit.Celsius, setting.MaxValue);
-                    setting.MinValue = _convertionService
-                        .ConvertTemperature(units.Temperature, TemperatureUnit.Celsius, setting.MinValue);
-                }
-            }
-        }
-
-        private void ConvertCargoUnits(Cargo cargo, Units units)
-        {
-            cargo.Height = _convertionService.ConvertLength(units.Length, LengthUnit.Meters, cargo.Height);
-            cargo.Width = _convertionService.ConvertLength(units.Length, LengthUnit.Meters, cargo.Width);
-            cargo.Length = _convertionService.ConvertLength(units.Length, LengthUnit.Meters, cargo.Length);
-            cargo.Weight = _convertionService.ConvertWeigth(units.Weight, WeightUnit.Kilograms, cargo.Weight);
-        }
     }
 }
