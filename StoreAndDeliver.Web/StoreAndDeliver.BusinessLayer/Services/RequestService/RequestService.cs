@@ -151,21 +151,24 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             return addedRequestDto;
         }
 
-        public async Task<bool> UpdateRequestStatuses(Guid carrierId, Dictionary<Guid, List<CargoRequest>> requestStatuses)
+        public async Task<bool> UpdateRequestStatuses(Guid carrierId, UpdateCargoRequestsDto updateModel)
         {
             CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(carrierId);
             try
             {
-                foreach (var k in requestStatuses.Keys)
+                foreach (var k in updateModel.RequestGroup.Keys)
                 {
-                    foreach (var v in requestStatuses[k])
+                    foreach (var v in updateModel.RequestGroup[k])
                     {
-                        v.Store = null;
-                        v.Cargo = null;
-                        v.Request = null;
-                        await _cargoRequestsRepository.Update(v);
-                        if(v.Status == RequestStatus.InProgress)
+                        _cargoService.ConvertCargoUnits(v.Cargo, updateModel.Units, null);
+                        if (v.Status == RequestStatus.InProgress)
                         {
+                            double currentVolume = v.Cargo.GetCargoVolume();
+                            carrier.CurrentOccupiedVolume += currentVolume;
+                            if (carrier.CurrentOccupiedVolume > carrier.MaxCargoVolume)
+                            {
+                                throw new Exception("Carrier is full");
+                            }
                             CargoSession cargoSession = new CargoSession
                             {
                                 Id = Guid.NewGuid(),
@@ -175,11 +178,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                             await _cargoSessionRepository.Insert(cargoSession);
                             await _cargoSessionRepository.Save();
                         }
+                        if (v.Status == RequestStatus.Completed)
+                        {
+                            double currentVolume = v.Cargo.GetCargoVolume();
+                            carrier.CurrentOccupiedVolume -= currentVolume;
+                        }
+                        v.Store = null;
+                        v.Cargo = null;
+                        v.Request = null;
+                        await _cargoRequestsRepository.Update(v);
                     }
+                    carrier.CargoSeesions = null;
+                    carrier.AppUser = null;
+                    await _carrierService.UpdateCarrier(carrier);
                 }
                 return true;
             }
-            catch
+            catch(Exception ex)
             {
                 return false;
             }
@@ -258,7 +273,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 requestsOptimizedByRoute = _requestAlgorithms.GetOptimizedRouteForCargoRequestGroups(optimizedRequests);
             }
             // Check carrier capacity.
-            double currentCapacity = 0;
+            double currentCapacity = carrier.CurrentOccupiedVolume;
             var requestsToProceedByCurrentCarrier = new List<List<CargoRequest>>();
             foreach (var optimizedRequest in requestsOptimizedByRoute)
             {

@@ -20,6 +20,7 @@ namespace StoreAndDeliver.DataLayer.Repositories.RequestRepository
                 .Where(r => r.StoreUntilDate < DateTime.Now && r.Type == Enums.RequestType.Store)
                 .Include(r => r.CargoRequests)
                 .ThenInclude(cr => cr.Cargo)
+                .AsNoTracking()
                 .Include(r => r.CargoRequests)
                 .ThenInclude(cr => cr.Store)
                 .AsNoTracking()

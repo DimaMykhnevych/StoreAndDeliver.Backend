@@ -8,5 +8,6 @@ namespace StoreAndDeliver.BusinessLayer.Services.CarrierService
     {
         Task<CarrierDto> GetCarrier(Guid id);
         Task<CarrierDto> GetCarrierByAppUserId(Guid id);
+        Task UpdateCarrier(CarrierDto carrierDto);
     }
 }

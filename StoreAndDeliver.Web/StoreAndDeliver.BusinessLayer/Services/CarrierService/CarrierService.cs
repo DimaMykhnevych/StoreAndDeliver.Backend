@@ -29,5 +29,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.CarrierService
             Carrier carrier = await _carrierRepository.GetCarrierByAppUserId(id);
             return _mapper.Map<CarrierDto>(carrier);
         }
+
+        public async Task UpdateCarrier(CarrierDto carrierDto)
+        {
+            Carrier carrier = _mapper.Map<Carrier>(carrierDto);
+            await _carrierRepository.UpdateCarrier(carrier);
+        }
     }
 }

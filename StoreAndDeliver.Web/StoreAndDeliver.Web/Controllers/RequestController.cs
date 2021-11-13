@@ -57,15 +57,11 @@ namespace StoreAndDeliver.Web.Controllers
         [HttpPut]
         [Route("updateRequestStautses")]
         public async Task<IActionResult> UpdateRequestStatuses
-            ([FromBody] Dictionary<Guid, List<CargoRequest>> requests)
+            ([FromBody] UpdateCargoRequestsDto requests)
         {
             var carrierId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
             var result = await _requestService.UpdateRequestStatuses(carrierId, requests);
-            if (result)
-            {
-                return Ok(result);
-            }
-            return BadRequest();
+            return Ok(result);
         }
     }
 }

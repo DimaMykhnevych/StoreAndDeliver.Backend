@@ -95,6 +95,17 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
 
         public void ConvertCargoUnits(Cargo cargo, Units unitsFrom, Units unitsTo)
         {
+            if (unitsTo == null)
+            {
+                unitsTo = new Units()
+                {
+                    Weight = WeightUnit.Kilograms,
+                    Length = LengthUnit.Meters,
+                    Temperature = TemperatureUnit.Celsius,
+                    Luminosity = LuminosityUnit.Lux,
+                    Humidity = HumidityUnit.Percentage
+                };
+            }
             cargo.Height = _convertionService.ConvertLength(unitsFrom.Length, unitsTo.Length, cargo.Height);
             cargo.Width = _convertionService.ConvertLength(unitsFrom.Length, unitsTo.Length, cargo.Width);
             cargo.Length = _convertionService.ConvertLength(unitsFrom.Length, unitsTo.Length, cargo.Length);

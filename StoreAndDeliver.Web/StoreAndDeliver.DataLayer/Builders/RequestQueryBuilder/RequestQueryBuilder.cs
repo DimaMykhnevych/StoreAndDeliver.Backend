@@ -33,6 +33,7 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
                 .ThenInclude(cr => cr.Cargo)
                 .ThenInclude(cr => cr.CargoSettings)
                 .ThenInclude(cs => cs.EnvironmentSetting)
+                .AsNoTracking()
                 .Include(r => r.CargoRequests)
                 .ThenInclude(cr => cr.Store)
                 .ThenInclude(cr => cr.Address)

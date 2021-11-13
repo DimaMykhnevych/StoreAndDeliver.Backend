@@ -14,7 +14,7 @@ namespace StoreAndDeliver.DataLayer.Repositories.StoreRepository
 
         public async Task<IEnumerable<Store>> GetStoresWithAddress()
         {
-            return await context.Stores.Include(s => s.Address).ToListAsync();
+            return await context.Stores.Include(s => s.Address).AsNoTracking().ToListAsync();
         }
     }
 }

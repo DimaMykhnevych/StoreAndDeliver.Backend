@@ -8,5 +8,6 @@ namespace StoreAndDeliver.DataLayer.Repositories.CarrierRepository
     {
         Task<Carrier> GetCarrier(Guid id);
         Task<Carrier> GetCarrierByAppUserId(Guid id);
+        Task UpdateCarrier(Carrier carrier);
     }
 }

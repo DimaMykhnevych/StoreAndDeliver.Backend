@@ -11,7 +11,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         Task<List<Dictionary<Guid, List<CargoRequest>>>> GetOptimizedRequestGroups(Guid currentCarrierId, GetRequestDto getOptimizedRequestDto);
         Task<RequestDto> AddRequest(AddRequestDto addRequestDto);
         Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto);
-        Task<bool> UpdateRequestStatuses(Guid carrierId, Dictionary<Guid, List<CargoRequest>> requestStatuses);
+        Task<bool> UpdateRequestStatuses(Guid carrierId, UpdateCargoRequestsDto updateModel);
         Task ConvertRequestsValues
             (List<Dictionary<Guid, List<CargoRequest>>> requestGroups, Units unitsTo, string currentLanguage);
     }
