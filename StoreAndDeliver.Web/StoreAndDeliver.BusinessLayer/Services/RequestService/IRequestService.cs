@@ -8,8 +8,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
 {
     public interface IRequestService
     {
-        Task<List<Dictionary<Guid, List<CargoRequest>>>> GetOptimizedRequestGroups(Guid currentCarrierId, GetOptimizedRequestDto getOptimizedRequestDto);
+        Task<List<Dictionary<Guid, List<CargoRequest>>>> GetOptimizedRequestGroups(Guid currentCarrierId, GetRequestDto getOptimizedRequestDto);
         Task<RequestDto> AddRequest(AddRequestDto addRequestDto);
         Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto);
+        Task<bool> UpdateRequestStatuses(Guid carrierId, Dictionary<Guid, List<CargoRequest>> requestStatuses);
+        Task ConvertRequestsValues
+            (List<Dictionary<Guid, List<CargoRequest>>> requestGroups, Units unitsTo, string currentLanguage);
     }
 }

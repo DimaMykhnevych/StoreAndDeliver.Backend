@@ -11,6 +11,7 @@ using StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder;
 using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
+using StoreAndDeliver.DataLayer.Repositories.CargoSessionRepository;
 using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         private readonly ICarrierService _carrierService;
         private readonly IRequestQueryBuilder _requestQueryBuilder;
         private readonly IRequestAlgorithms _requestAlgorithms;
+        private readonly ICargoSessionRepository _cargoSessionRepository;
         private readonly IMapper _mapper;
 
         public RequestService(IRequestRepository requestRepository,
@@ -41,6 +43,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             ICarrierService carrierService,
             IRequestQueryBuilder requestQueryBuilder,
             IRequestAlgorithms requestAlgorithms,
+            ICargoSessionRepository cargoSessionRepository,
             IMapper mapper)
         {
             _requestRepository = requestRepository;
@@ -52,11 +55,12 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             _carrierService = carrierService;
             _requestQueryBuilder = requestQueryBuilder;
             _requestAlgorithms = requestAlgorithms;
+            _cargoSessionRepository = cargoSessionRepository;
             _mapper = mapper;
         }
 
         public async Task<List<Dictionary<Guid, List<CargoRequest>>>> GetOptimizedRequestGroups
-            (Guid currentCarrierId, GetOptimizedRequestDto getOptimizedRequestDto)
+            (Guid currentCarrierId, GetRequestDto getOptimizedRequestDto)
         {
             CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(currentCarrierId);
 
@@ -147,6 +151,40 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             return addedRequestDto;
         }
 
+        public async Task<bool> UpdateRequestStatuses(Guid carrierId, Dictionary<Guid, List<CargoRequest>> requestStatuses)
+        {
+            CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(carrierId);
+            try
+            {
+                foreach (var k in requestStatuses.Keys)
+                {
+                    foreach (var v in requestStatuses[k])
+                    {
+                        v.Store = null;
+                        v.Cargo = null;
+                        v.Request = null;
+                        await _cargoRequestsRepository.Update(v);
+                        if(v.Status == RequestStatus.InProgress)
+                        {
+                            CargoSession cargoSession = new CargoSession
+                            {
+                                Id = Guid.NewGuid(),
+                                CargoRequestId = v.Id,
+                                CarrierId = carrier.Id
+                            };
+                            await _cargoSessionRepository.Insert(cargoSession);
+                            await _cargoSessionRepository.Save();
+                        }
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public async Task<decimal> CalculateRequestPrice(AddRequestDto requestAddDto)
         {
             decimal bonus = await CalculateBonusForUser(requestAddDto.CurrentUserId);
@@ -164,20 +202,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             return sum;
         }
 
-        private List<Dictionary<Guid, List<CargoRequest>>> GroupCargoRequestsByRequests
-            (List<List<CargoRequest>> cargoRequests)
-        {
-            List<Dictionary<Guid, List<CargoRequest>>> result = new();
-            foreach(var cr in cargoRequests)
-            {
-                Dictionary<Guid, List<CargoRequest>> groupedRequests = cr.GroupBy(c => c.RequestId)
-                    .ToDictionary(g => g.Key, g => g.ToList());
-                result.Add(groupedRequests);
-            }
-            return result;
-        }
-
-        private async Task ConvertRequestsValues
+        public async Task ConvertRequestsValues
             (List<Dictionary<Guid, List<CargoRequest>>> requestGroups, Units unitsTo, string currentLanguage)
         {
             Units unitsFrom = new Units()
@@ -188,11 +213,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 Luminosity = LuminosityUnit.Lux,
                 Humidity = HumidityUnit.Percentage
             };
-            foreach(var group in requestGroups)
+            foreach (var group in requestGroups)
             {
-                foreach(var keyValue in group)
+                foreach (var keyValue in group)
                 {
-                    foreach(var value in keyValue.Value)
+                    foreach (var value in keyValue.Value)
                     {
                         _cargoService.ConvertCargoUnits(value.Cargo, unitsFrom, unitsTo);
                         await _cargoService.ConvertCargoSettings(value.Cargo.CargoSettings, unitsFrom, unitsTo);
@@ -208,6 +233,19 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                     //}
                 }
             }
+        }
+
+        private static List<Dictionary<Guid, List<CargoRequest>>> GroupCargoRequestsByRequests
+            (List<List<CargoRequest>> cargoRequests)
+        {
+            List<Dictionary<Guid, List<CargoRequest>>> result = new();
+            foreach(var cr in cargoRequests)
+            {
+                Dictionary<Guid, List<CargoRequest>> groupedRequests = cr.GroupBy(c => c.RequestId)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                result.Add(groupedRequests);
+            }
+            return result;
         }
 
         private List<List<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, 

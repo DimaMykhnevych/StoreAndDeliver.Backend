@@ -5,6 +5,7 @@ using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
 using StoreAndDeliver.DataLayer.Models;
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -25,7 +26,7 @@ namespace StoreAndDeliver.Web.Controllers
         [HttpPost]
         [Route("optimizedRequests")]
         [Authorize(Roles = Role.Carrier)]
-        public async Task<IActionResult> GetOptimizedRequestGroups([FromBody] GetOptimizedRequestDto getOptimizedRequestDto)
+        public async Task<IActionResult> GetOptimizedRequestGroups([FromBody] GetRequestDto getOptimizedRequestDto)
         {
             //TODO uncomment in _requestService.ConvertRequestsValues for real currency converting
             Guid carrierId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
@@ -51,6 +52,20 @@ namespace StoreAndDeliver.Web.Controllers
             addRequestDto.CurrentUserId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
             //decimal price = await _requestService.CalculateRequestPrice(addRequestDto);
             return Ok(10);
+        }
+
+        [HttpPut]
+        [Route("updateRequestStautses")]
+        public async Task<IActionResult> UpdateRequestStatuses
+            ([FromBody] Dictionary<Guid, List<CargoRequest>> requests)
+        {
+            var carrierId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
+            var result = await _requestService.UpdateRequestStatuses(carrierId, requests);
+            if (result)
+            {
+                return Ok(result);
+            }
+            return BadRequest();
         }
     }
 }
