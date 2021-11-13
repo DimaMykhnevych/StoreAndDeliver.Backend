@@ -80,6 +80,14 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 //Requests grouped by all applicable combinations of setting values
                 optimizedCargoRequests = OptimizeDeliverRequests(carrier, cargoRequests).ToList();
             }
+            else
+            {
+                requests = baseRequestInfo.SetStoreDates(DateTime.Now, null).Build().ToList();
+                List<CargoRequest> cargoRequests = requests
+                    .SelectMany(r => r.CargoRequests)
+                    .Where(cr => cr.Status == RequestStatus.Pending).ToList();
+                optimizedCargoRequests = OptimizeDeliverRequests(carrier, cargoRequests, false).ToList();
+            }
             var groupedOptimizedRequests = GroupCargoRequestsByRequests(optimizedCargoRequests);
             await ConvertRequestsValues(groupedOptimizedRequests, 
                 getOptimizedRequestDto.Units, 
@@ -202,10 +210,15 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             }
         }
 
-        private List<List<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, List<CargoRequest> cargoRequests)
+        private List<List<CargoRequest>> OptimizeDeliverRequests(CarrierDto carrier, 
+            List<CargoRequest> cargoRequests, bool optimizeRoute = true)
         {
             var optimizedRequests = _requestAlgorithms.GetOptimizedRequests(cargoRequests);
-            var requestsOptimizedByRoute = _requestAlgorithms.GetOptimizedRouteForCargoRequestGroups(optimizedRequests);
+            var requestsOptimizedByRoute = optimizedRequests;
+            if (optimizeRoute)
+            {
+                requestsOptimizedByRoute = _requestAlgorithms.GetOptimizedRouteForCargoRequestGroups(optimizedRequests);
+            }
             // Check carrier capacity.
             double currentCapacity = 0;
             var requestsToProceedByCurrentCarrier = new List<List<CargoRequest>>();
