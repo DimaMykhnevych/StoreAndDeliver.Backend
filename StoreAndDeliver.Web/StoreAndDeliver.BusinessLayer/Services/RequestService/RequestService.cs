@@ -194,7 +194,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 }
                 return true;
             }
-            catch(Exception ex)
+            catch
             {
                 return false;
             }

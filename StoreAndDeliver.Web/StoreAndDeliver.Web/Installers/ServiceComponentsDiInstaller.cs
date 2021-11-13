@@ -5,6 +5,7 @@ using StoreAndDeliver.BusinessLayer.Clients.ExchangerApiClient;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
 using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
+using StoreAndDeliver.BusinessLayer.Services.CargoRequestService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
 using StoreAndDeliver.BusinessLayer.Services.CargoSessionService;
 using StoreAndDeliver.BusinessLayer.Services.CarrierService;
@@ -15,6 +16,7 @@ using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
+using StoreAndDeliver.DataLayer.Builders.CargoRequestQueryBuilder;
 using StoreAndDeliver.DataLayer.Builders.CargoSessionQueryBuilder;
 using StoreAndDeliver.DataLayer.Builders.CitiesQueryBuilder;
 using StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder;
@@ -52,6 +54,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICarrierService, CarrierService>();
             services.AddTransient<IRequestAlgorithms, RequestAlgorithms>();
             services.AddTransient<ICargoSessionService, CargoSessionService>();
+            services.AddTransient<ICargoRequestService, CargoRequestService>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
@@ -60,6 +63,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICitiesQueryBuilder, CitiesQueryBuilder>();
             services.AddTransient<IRequestQueryBuilder, RequestQueryBuilder>();
             services.AddTransient<ICargoSessionQueryBuilder, CargoSessionQueryBuilder>();
+            services.AddTransient<ICargoRequestQueryBuilder, CargoRequestQueryBuilder>();
 
             // repositories
             services.AddTransient<IUserRepository, UserRepository>();
