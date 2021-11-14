@@ -8,7 +8,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
     public interface IUserService
     {
         Task<AppUser> GetUserByUsername(string username);
-        Task<AppUser> CreateUserAsync(CreateUserDto userModel, string language);
+        Task<AppUser> CreateUserAsync(CreateUserDto userModel, string language, bool sendConfirmationEmail);
         Task DeleteUser(Guid userId);
         Task<ConfirmEmailDto> ConfirmEmail(ConfirmEmailDto confirmEmailDto);
     }

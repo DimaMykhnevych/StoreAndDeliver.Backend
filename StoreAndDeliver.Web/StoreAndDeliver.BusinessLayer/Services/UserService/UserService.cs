@@ -30,7 +30,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
             return await _userManager.FindByNameAsync(username);
         }
 
-        public async Task<AppUser> CreateUserAsync(CreateUserDto model, string language)
+        public async Task<AppUser> CreateUserAsync(CreateUserDto model, string language, bool sendConfirmationEmail)
         {
             if(model.ConfirmPassword != model.Password)
             {
@@ -44,21 +44,26 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
 
             AppUser user = _mapper.Map<AppUser>(model);
             user.RegistryDate = DateTime.Now;
+            if (!sendConfirmationEmail)
+            {
+                user.EmailConfirmed = true;
+            }
             IdentityResult addUserResult = await _userManager.CreateAsync(user, model.Password);
 
             ValidateIdentityResult(addUserResult);
 
-            string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            if (sendConfirmationEmail)
+            {
+                string token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-            var param = new Dictionary<string, string>
+                var param = new Dictionary<string, string>
                 {
                     {"token", token },
                     {"email", user.Email }
                 };
-            string url = QueryHelpers.AddQueryString(model.ClientURIForEmailConfirmation, param);
-            await _emailService.SendEmail(user, url, language);
-
-
+                string url = QueryHelpers.AddQueryString(model.ClientURIForEmailConfirmation, param);
+                await _emailService.SendEmail(user, url, language);
+            }
             return await GetUserByUsername(user.UserName);
         }
 

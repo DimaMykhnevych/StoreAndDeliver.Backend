@@ -35,7 +35,7 @@ namespace StoreAndDeliver.Web.Controllers
             var language = Request.Headers["language"];
             try
             {
-                return Ok(await _service.CreateUserAsync(model, language));
+                return Ok(await _service.CreateUserAsync(model, language, true));
             }
             catch (UsernameAlreadyTakenException)
             {
