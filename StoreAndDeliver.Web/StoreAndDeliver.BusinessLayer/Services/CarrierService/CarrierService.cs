@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Exceptions;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
@@ -17,20 +18,26 @@ namespace StoreAndDeliver.BusinessLayer.Services.CarrierService
         private readonly IUserService _userService;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
-        public CarrierService(ICarrierRepository carrierRepository, 
+
+        public CarrierService(ICarrierRepository carrierRepository,
             IUserService userService,
             UserManager<AppUser> userManager,
-            IMapper mapper)
+            IMapper mapper,
+            ILoggerFactory loggerFactory)
         {
             _carrierRepository = carrierRepository;
             _userService = userService;
             _userManager = userManager;
             _mapper = mapper;
+
+            _logger = loggerFactory?.CreateLogger("Carrier Service");
         }
 
         public async Task<CarrierDto> GetCarrier(Guid id)
         {
+            _logger.LogInformation($"Get Carrier {id}");
             Carrier carrier = await _carrierRepository.GetCarrier(id);
             return _mapper.Map<CarrierDto>(carrier);
         }
@@ -43,6 +50,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CarrierService
 
         public async Task<IEnumerable<CarrierDto>> GetCarriers()
         {
+            _logger.LogInformation($"Get Carriers");
             IEnumerable<Carrier> carriers = await _carrierRepository.GetCarriers();
             return _mapper.Map<IEnumerable<CarrierDto>>(carriers);
         }
