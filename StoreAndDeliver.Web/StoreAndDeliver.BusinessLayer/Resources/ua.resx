@@ -120,6 +120,9 @@
   <data name="ConfirmAccount" xml:space="preserve">
     <value>Підтвердити акаунт</value>
   </data>
+  <data name="Deliver" xml:space="preserve">
+    <value>Доставка</value>
+  </data>
   <data name="EmailMainContent" xml:space="preserve">
     <value>Будь ласка, підтвердити акаунт, натиснувши на посилання нижче.</value>
   </data>
@@ -128,6 +131,15 @@
   </data>
   <data name="Hello" xml:space="preserve">
     <value>Доброго дня,</value>
+  </data>
+  <data name="Store" xml:space="preserve">
+    <value>Збереження</value>
+  </data>
+  <data name="SuccessRequestCompletion" xml:space="preserve">
+    <value>Успішне Виконання Заяви</value>
+  </data>
+  <data name="SuccessRequestMainContent" xml:space="preserve">
+    <value>Наступні заяви були успішно виконані</value>
   </data>
   <data name="ThankYou" xml:space="preserve">
     <value>Дякуємо</value>

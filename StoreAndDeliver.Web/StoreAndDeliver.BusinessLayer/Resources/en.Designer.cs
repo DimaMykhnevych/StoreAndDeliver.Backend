@@ -70,6 +70,15 @@ namespace StoreAndDeliver.BusinessLayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deliver.
+        /// </summary>
+        internal static string Deliver {
+            get {
+                return ResourceManager.GetString("Deliver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please, confirm your account by clicking the following link..
         /// </summary>
         internal static string EmailMainContent {
@@ -93,6 +102,33 @@ namespace StoreAndDeliver.BusinessLayer.Resources {
         internal static string Hello {
             get {
                 return ResourceManager.GetString("Hello", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Store.
+        /// </summary>
+        internal static string Store {
+            get {
+                return ResourceManager.GetString("Store", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successful Request Completion.
+        /// </summary>
+        internal static string SuccessRequestCompletion {
+            get {
+                return ResourceManager.GetString("SuccessRequestCompletion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following requests were successfully completed.
+        /// </summary>
+        internal static string SuccessRequestMainContent {
+            get {
+                return ResourceManager.GetString("SuccessRequestMainContent", resourceCulture);
             }
         }
         

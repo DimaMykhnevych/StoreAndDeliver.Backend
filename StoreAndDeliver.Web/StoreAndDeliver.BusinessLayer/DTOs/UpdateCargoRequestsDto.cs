@@ -8,5 +8,6 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
     {
         public Dictionary<Guid, List<CargoRequest>> RequestGroup { get; set; }
         public Units Units { get; set; }
+        public string Language { get; set; }
     }
 }

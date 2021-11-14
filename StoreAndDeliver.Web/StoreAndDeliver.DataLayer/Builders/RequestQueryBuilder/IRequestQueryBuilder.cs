@@ -7,6 +7,7 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
     public interface IRequestQueryBuilder : IQueryBuilder<Request>
     {
         IRequestQueryBuilder SetBaseRequestInfo();
+        IRequestQueryBuilder SetRequestId(Guid id);
         IRequestQueryBuilder SetRequestType(RequestType? type);
         IRequestQueryBuilder SortByDeliverByDate();
         IRequestQueryBuilder SetCarryOutBeforeDate(DateTime? time);

@@ -70,6 +70,15 @@ namespace StoreAndDeliver.BusinessLayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Доставка.
+        /// </summary>
+        internal static string Deliver {
+            get {
+                return ResourceManager.GetString("Deliver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Будь ласка, підтвердити акаунт, натиснувши на посилання нижче..
         /// </summary>
         internal static string EmailMainContent {
@@ -93,6 +102,33 @@ namespace StoreAndDeliver.BusinessLayer.Resources {
         internal static string Hello {
             get {
                 return ResourceManager.GetString("Hello", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Збереження.
+        /// </summary>
+        internal static string Store {
+            get {
+                return ResourceManager.GetString("Store", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Успішне Виконання Заяви.
+        /// </summary>
+        internal static string SuccessRequestCompletion {
+            get {
+                return ResourceManager.GetString("SuccessRequestCompletion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Наступні заяви були успішно виконані.
+        /// </summary>
+        internal static string SuccessRequestMainContent {
+            get {
+                return ResourceManager.GetString("SuccessRequestMainContent", resourceCulture);
             }
         }
         

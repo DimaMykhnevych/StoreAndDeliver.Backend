@@ -42,6 +42,12 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
             return this;
         }
 
+        public IRequestQueryBuilder SetRequestId(Guid id)
+        {
+            _query = _query.Where(r => r.Id == id);
+            return this;
+        }
+
         public IRequestQueryBuilder SetCarryOutBeforeDate(DateTime? time)
         {
             if(time != null)

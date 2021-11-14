@@ -6,6 +6,7 @@ using StoreAndDeliver.BusinessLayer.Services.AddressService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
 using StoreAndDeliver.BusinessLayer.Services.CarrierService;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
+using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder;
 using StoreAndDeliver.DataLayer.Enums;
@@ -13,6 +14,7 @@ using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoSessionRepository;
 using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
+using StoreAndDeliver.DataLayer.Repositories.UserRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +31,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         private readonly ICargoService _cargoService;
         private readonly IStoreService _storeService;
         private readonly ICarrierService _carrierService;
+        private readonly IEmailService _emailService;
         private readonly IRequestQueryBuilder _requestQueryBuilder;
         private readonly IRequestAlgorithms _requestAlgorithms;
         private readonly ICargoSessionRepository _cargoSessionRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
         public RequestService(IRequestRepository requestRepository,
@@ -41,9 +45,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             ICargoRequestsRepository cargoRequestsRepository,
             IStoreService storeService,
             ICarrierService carrierService,
+            IEmailService emailService,
             IRequestQueryBuilder requestQueryBuilder,
             IRequestAlgorithms requestAlgorithms,
             ICargoSessionRepository cargoSessionRepository,
+            IUserRepository userRepository,
             IMapper mapper)
         {
             _requestRepository = requestRepository;
@@ -53,9 +59,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             _cargoRequestsRepository = cargoRequestsRepository;
             _storeService = storeService;
             _carrierService = carrierService;
+            _emailService = emailService;
             _requestQueryBuilder = requestQueryBuilder;
             _requestAlgorithms = requestAlgorithms;
             _cargoSessionRepository = cargoSessionRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
         }
 
@@ -154,6 +162,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
         public async Task<bool> UpdateRequestStatuses(Guid carrierId, UpdateCargoRequestsDto updateModel)
         {
             CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(carrierId);
+            bool isCompleted = false;
             try
             {
                 foreach (var k in updateModel.RequestGroup.Keys)
@@ -180,10 +189,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                         }
                         if (v.Status == RequestStatus.Completed)
                         {
+                            isCompleted = true;
                             double currentVolume = v.Cargo.GetCargoVolume();
                             carrier.CurrentOccupiedVolume -= currentVolume;
                             if (carrier.CurrentOccupiedVolume < 0 ||
-                                (carrier.CurrentOccupiedVolume > 0 && carrier.CurrentOccupiedVolume < 1)) 
+                                (carrier.CurrentOccupiedVolume > 0 && carrier.CurrentOccupiedVolume < 1))
                                 carrier.CurrentOccupiedVolume = 0;
                         }
                         v.Store = null;
@@ -194,6 +204,10 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                     carrier.CargoSeesions = null;
                     carrier.AppUser = null;
                     await _carrierService.UpdateCarrier(carrier);
+                }
+                if (isCompleted)
+                {
+                    await SendSuccessfullDeliveryEmail(updateModel);
                 }
                 return true;
             }
@@ -261,6 +275,31 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             //        keyValue.Value[0].Request.TotalSum = price;
             //    }
             //}
+        }
+
+        private async Task SendSuccessfullDeliveryEmail(UpdateCargoRequestsDto updateModel)
+        {
+            var cargoRequests = updateModel.RequestGroup.SelectMany(c => c.Value).ToList();
+            foreach(var r in cargoRequests)
+            {
+                if(r.Request == null)
+                {
+                    r.Request = _requestQueryBuilder
+                        .SetBaseRequestInfo()
+                        .SetRequestId(r.RequestId)
+                        .Build().FirstOrDefault();
+                }
+                var requestUser = r.Request.AppUser;
+                if(requestUser == null)
+                {
+                    r.Request.AppUser = await _userRepository.Get(r.Request.AppUserId);
+                }
+                r.Cargo = r.Request.CargoRequests.FirstOrDefault(cr => cr.Id == r.Id).Cargo;
+            }
+            var requestsGroupedByUser = cargoRequests
+                .GroupBy(cr => cr.Request.AppUser)
+                .ToDictionary(k => k.Key, k => k.ToList());
+            await _emailService.SendSuccessfullDeliveryEmail(requestsGroupedByUser, updateModel.Language);
         }
 
         private static List<Dictionary<Guid, List<CargoRequest>>> GroupCargoRequestsByRequests

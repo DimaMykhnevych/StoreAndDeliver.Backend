@@ -59,5 +59,86 @@ namespace StoreAndDeliver.BusinessLayer.Resources {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Подтвердите аккаунт.
+        /// </summary>
+        internal static string ConfirmAccount {
+            get {
+                return ResourceManager.GetString("ConfirmAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Доставка.
+        /// </summary>
+        internal static string Deliver {
+            get {
+                return ResourceManager.GetString("Deliver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Пожалуйста, подтвердите аккаунт, перейдя по ссылке.
+        /// </summary>
+        internal static string EmailMainContent {
+            get {
+                return ResourceManager.GetString("EmailMainContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Подтверждение аккаунта.
+        /// </summary>
+        internal static string EmailSubject {
+            get {
+                return ResourceManager.GetString("EmailSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Добрый день,.
+        /// </summary>
+        internal static string Hello {
+            get {
+                return ResourceManager.GetString("Hello", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Хранение.
+        /// </summary>
+        internal static string Store {
+            get {
+                return ResourceManager.GetString("Store", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Успешное выполнения заявки.
+        /// </summary>
+        internal static string SuccessRequestCompletion {
+            get {
+                return ResourceManager.GetString("SuccessRequestCompletion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Следующие заявки были успешно выполнены.
+        /// </summary>
+        internal static string SuccessRequestMainContent {
+            get {
+                return ResourceManager.GetString("SuccessRequestMainContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Спасибо.
+        /// </summary>
+        internal static string ThankYou {
+            get {
+                return ResourceManager.GetString("ThankYou", resourceCulture);
+            }
+        }
     }
 }
