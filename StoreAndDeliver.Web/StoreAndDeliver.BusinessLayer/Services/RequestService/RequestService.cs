@@ -182,6 +182,9 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                         {
                             double currentVolume = v.Cargo.GetCargoVolume();
                             carrier.CurrentOccupiedVolume -= currentVolume;
+                            if (carrier.CurrentOccupiedVolume < 0 ||
+                                (carrier.CurrentOccupiedVolume > 0 && carrier.CurrentOccupiedVolume < 1)) 
+                                carrier.CurrentOccupiedVolume = 0;
                         }
                         v.Store = null;
                         v.Cargo = null;
@@ -228,26 +231,36 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
                 Luminosity = LuminosityUnit.Lux,
                 Humidity = HumidityUnit.Percentage
             };
+            HashSet<CargoRequest> cargoRequests = new();
+            HashSet<Request> requests = new();
             foreach (var group in requestGroups)
             {
                 foreach (var keyValue in group)
                 {
                     foreach (var value in keyValue.Value)
                     {
-                        _cargoService.ConvertCargoUnits(value.Cargo, unitsFrom, unitsTo);
-                        await _cargoService.ConvertCargoSettings(value.Cargo.CargoSettings, unitsFrom, unitsTo);
+                        cargoRequests.Add(value);
+                        requests.Add(value.Request);
                     }
-
-                    // Converting currency
-                    // UNCOMMENT to real currency convertion
-                    //if(currentLanguage != Languages.ENGLISH)
-                    //{
-                    //    string toCurrency = GetCurrencyUnit(currentLanguage);
-                    //    decimal price = await _convertionService.ConvertCurrency(Currency.Usd, toCurrency, keyValue.Value[0].Request.TotalSum);
-                    //    keyValue.Value[0].Request.TotalSum = price;
-                    //}
                 }
             }
+            foreach(var cr in cargoRequests)
+            {
+                _cargoService.ConvertCargoUnits(cr.Cargo, unitsFrom, unitsTo);
+                await _cargoService.ConvertCargoSettings(cr.Cargo.CargoSettings, unitsFrom, unitsTo);
+            }
+
+            // Converting currency
+            //foreach (var r in requests)
+            //{
+            //    UNCOMMENT to real currency convertion
+            //    if (currentLanguage != Languages.ENGLISH)
+            //    {
+            //        string toCurrency = GetCurrencyUnit(currentLanguage);
+            //        decimal price = await _convertionService.ConvertCurrency(Currency.Usd, toCurrency, keyValue.Value[0].Request.TotalSum);
+            //        keyValue.Value[0].Request.TotalSum = price;
+            //    }
+            //}
         }
 
         private static List<Dictionary<Guid, List<CargoRequest>>> GroupCargoRequestsByRequests

@@ -68,7 +68,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
                 await _cargoRequestsRepository.Insert(cargoRequest);
                 await _cargoRequestsRepository.Save();
                 optimalStore.CurrentOccupiedVolume += GetCargoVolume(c);
-                await _storeRepository.Update(optimalStore);
+                await _storeRepository.UpdateStore(optimalStore);
             }
             return true;
         }
@@ -84,7 +84,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
                     if (r.Store != null && r.Store.CurrentOccupiedVolume > 0)
                     {
                         r.Store.CurrentOccupiedVolume -= r.Cargo.GetCargoVolume();
-                        await _storeRepository.Update(r.Store);
+                        await _storeRepository.UpdateStore(r.Store);
                     }
                 }
             }
