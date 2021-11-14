@@ -35,6 +35,11 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
             _mapper = mapper;
         }
 
+        public async Task<IEnumerable<StoreDto>> GetStores()
+        {
+            IEnumerable<Store> stores = await _storeRepository.GetStoresWithAddress();
+            return _mapper.Map<IEnumerable<StoreDto>>(stores);
+        }
 
         public async Task<StoreDto> CreateStore(AddStoreDto storeDto)
         {
@@ -46,6 +51,20 @@ namespace StoreAndDeliver.BusinessLayer.Services.StoreService
             await _storeRepository.Insert(store);
             await _storeRepository.Save();
             return _mapper.Map<StoreDto>(store);
+        }
+
+        public async Task<bool> DeleteStore(Guid id)
+        {
+            Store store = await _storeRepository.Get(id);
+            if(store == null)
+            {
+                return false;
+            }
+            Guid addressId = store.AddressId;
+            _storeRepository.Delete(store);
+            await _storeRepository.Save();
+            await _addressService.DeleteAddress(addressId);
+            return true;
         }
 
         public async Task<bool> DistrubuteCargoByStores(IEnumerable<CargoDto> cargo, RequestDto request)

@@ -15,8 +15,8 @@ namespace StoreAndDeliver.BusinessLayer.Services.AddressService
         private readonly ICityRepository _cityRepository;
         private readonly IMapper _mapper;
 
-        public AddressService(IAddressRepository addressRepository, 
-            ICityRepository cityRepository, 
+        public AddressService(IAddressRepository addressRepository,
+            ICityRepository cityRepository,
             IMapper mapper)
         {
             _addressRepository = addressRepository;
@@ -34,7 +34,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.AddressService
         {
             Address address = _mapper.Map<Address>(addressDto);
             Address existingAddress = await _addressRepository.Get(address.Id);
-            if(existingAddress != null)
+            if (existingAddress != null)
             {
                 return _mapper.Map<AddressDto>(existingAddress);
             }
@@ -43,6 +43,18 @@ namespace StoreAndDeliver.BusinessLayer.Services.AddressService
             var addedAddress = await _addressRepository.Insert(address);
             await _addressRepository.Save();
             return _mapper.Map<AddressDto>(addedAddress);
+        }
+
+        public async Task<bool> DeleteAddress(Guid id)
+        {
+            Address address = await _addressRepository.Get(id);
+            if(address == null)
+            {
+                return false;
+            }
+            _addressRepository.Delete(address);
+            await _addressRepository.Save();
+            return true;
         }
 
         private async Task GetAddressCoordinates(Address address)
