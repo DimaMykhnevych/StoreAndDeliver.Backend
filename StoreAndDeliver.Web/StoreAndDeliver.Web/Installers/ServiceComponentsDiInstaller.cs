@@ -8,6 +8,7 @@ using StoreAndDeliver.BusinessLayer.Services.AdminService;
 using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
 using StoreAndDeliver.BusinessLayer.Services.CargoRequestService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
+using StoreAndDeliver.BusinessLayer.Services.CargoSessionNoteService;
 using StoreAndDeliver.BusinessLayer.Services.CargoSessionService;
 using StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService;
 using StoreAndDeliver.BusinessLayer.Services.CarrierService;
@@ -26,6 +27,7 @@ using StoreAndDeliver.DataLayer.Repositories.AddressRepository;
 using StoreAndDeliver.DataLayer.Repositories.BackupRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
+using StoreAndDeliver.DataLayer.Repositories.CargoSessionNoteRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoSessionRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository;
 using StoreAndDeliver.DataLayer.Repositories.CarrierRepository;
@@ -62,6 +64,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICargoRequestService, CargoRequestService>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<ICargoSnapshotService, CargoSnapshotService>();
+            services.AddTransient<ICargoSessionNoteService, CargoSessionNoteService>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
@@ -86,6 +89,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IBackupRepository, BackupRepository>();
             services.AddTransient<ILogsRepository, LogsRepository>();
             services.AddTransient<ICargoSnapshotsRepository, CargoSnapshotsRepository>();
+            services.AddTransient<ICargoSessionNoteRepository, CargoSessionNoteRepository>();
         }
     }
 }

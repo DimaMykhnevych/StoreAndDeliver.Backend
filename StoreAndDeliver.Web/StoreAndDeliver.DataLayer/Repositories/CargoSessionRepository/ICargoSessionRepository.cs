@@ -9,5 +9,6 @@ namespace StoreAndDeliver.DataLayer.Repositories.CargoSessionRepository
     public interface ICargoSessionRepository : IRepository<CargoSession>
     {
         Task<IEnumerable<CargoRequest>> GetCarrierCargoRequests(Guid carrierId, RequestType requestType);
+        Task<CargoSession> GetCargoSessionByCargoRequestId(Guid cargoRequestId);
     }
 }

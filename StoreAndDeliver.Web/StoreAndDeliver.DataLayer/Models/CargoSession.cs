@@ -12,5 +12,6 @@ namespace StoreAndDeliver.DataLayer.Models
         public Carrier Carrier { get; set; }
         public CargoRequest CargoRequest { get; set; }
         public IEnumerable<CargoSnapshot> CargoSnapshots {get; set;}
+        public IEnumerable<CargoSessionNote> CargoSessionNotes { get; set; }
     }
 }

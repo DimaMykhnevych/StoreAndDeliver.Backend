@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace StoreAndDeliver.DataLayer.Models
+namespace StoreAndDeliver.BusinessLayer.DTOs
 {
-    public class CargoSessionNote
+    public class CargoSessionNoteDto
     {
         public Guid Id { get; set; }
         public DateTime NoteCreationDate { get; set; }
         public string Content { get; set; }
 
         public Guid CargoSessionId { get; set; }
-        public CargoSession CargoSession { get; set; }
     }
 }

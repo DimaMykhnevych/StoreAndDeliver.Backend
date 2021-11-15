@@ -27,6 +27,8 @@ namespace StoreAndDeliver.BusinessLayer.Mappers
             CreateMap<CarrierDto, Carrier>().ReverseMap();
             CreateMap<CargoSnapshotDto, CargoSnapshot>().ReverseMap();
             CreateMap<AddCargoSnapshotDto, CargoSnapshot>().ReverseMap();
+            CreateMap<CargoSessionNoteDto, CargoSessionNote>().ReverseMap();
+            CreateMap<AddCargoSessionNoteDto, CargoSessionNote>().ReverseMap();
         }
     }
 }
