@@ -4,6 +4,7 @@ using StoreAndDeliver.BusinessLayer.Calculations.Algorithms;
 using StoreAndDeliver.BusinessLayer.Clients.ExchangerApiClient;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
+using StoreAndDeliver.BusinessLayer.Services.AdminService;
 using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
 using StoreAndDeliver.BusinessLayer.Services.CargoRequestService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
@@ -21,12 +22,14 @@ using StoreAndDeliver.DataLayer.Builders.CargoSessionQueryBuilder;
 using StoreAndDeliver.DataLayer.Builders.CitiesQueryBuilder;
 using StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder;
 using StoreAndDeliver.DataLayer.Repositories.AddressRepository;
+using StoreAndDeliver.DataLayer.Repositories.BackupRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoRequestsRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoSessionRepository;
 using StoreAndDeliver.DataLayer.Repositories.CarrierRepository;
 using StoreAndDeliver.DataLayer.Repositories.CityRepository;
 using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
+using StoreAndDeliver.DataLayer.Repositories.LogsRepository;
 using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
 using StoreAndDeliver.DataLayer.Repositories.StoreRepository;
 using StoreAndDeliver.DataLayer.Repositories.UserRepository;
@@ -55,6 +58,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IRequestAlgorithms, RequestAlgorithms>();
             services.AddTransient<ICargoSessionService, CargoSessionService>();
             services.AddTransient<ICargoRequestService, CargoRequestService>();
+            services.AddTransient<IAdminService, AdminService>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
@@ -76,6 +80,8 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IStoreRepository, StoreRepository>();
             services.AddTransient<ICarrierRepository, CarrierRepository>();
             services.AddTransient<ICargoSessionRepository, CargoSessionRepository>();
+            services.AddTransient<IBackupRepository, BackupRepository>();
+            services.AddTransient<ILogsRepository, LogsRepository>();
         }
     }
 }
