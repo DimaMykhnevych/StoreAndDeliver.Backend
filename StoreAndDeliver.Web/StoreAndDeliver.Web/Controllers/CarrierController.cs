@@ -42,6 +42,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Role.CompanyAdmin)]
         public async Task<IActionResult> AddCarrier([FromBody] AddCarrierDto carrierDto)
         {
             try
@@ -59,6 +60,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = Role.CompanyAdmin)]
         public async Task<IActionResult> UpdateCarrier([FromBody] UpdateCarrierDto updateCarrierDto)
         {
             try
@@ -73,6 +75,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = Role.CompanyAdmin)]
         public async Task<IActionResult> DeleteCarrier(Guid id)
         {
             return Ok(await _carrierService.DeleteCarrier(id));

@@ -23,6 +23,7 @@ namespace StoreAndDeliver.DataLayer.DbContext
         public DbSet<CargoSession> CargoSessions { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<City> Cities { get; set; }
+        public DbSet<CargoSnapshot> CargoSnapshots { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

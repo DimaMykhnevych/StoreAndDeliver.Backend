@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace StoreAndDeliver.DataLayer.Models
 {
@@ -10,5 +11,6 @@ namespace StoreAndDeliver.DataLayer.Models
 
         public Carrier Carrier { get; set; }
         public CargoRequest CargoRequest { get; set; }
+        public IEnumerable<CargoSnapshot> CargoSnapshots {get; set;}
     }
 }

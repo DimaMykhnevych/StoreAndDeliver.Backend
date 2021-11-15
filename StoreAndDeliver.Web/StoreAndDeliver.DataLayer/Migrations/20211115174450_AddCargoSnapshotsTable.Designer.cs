@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StoreAndDeliver.DataLayer.DbContext;
 
 namespace StoreAndDeliver.DataLayer.Migrations
 {
     [DbContext(typeof(StoreAndDeliverDbContext))]
-    partial class StoreAndDeliverDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211115174450_AddCargoSnapshotsTable")]
+    partial class AddCargoSnapshotsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -319,7 +321,7 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.ToTable("CargoSettings");
                 });
 
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.CargoSnapshot", b =>
+            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.CargoSnapshots", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -330,9 +332,6 @@ namespace StoreAndDeliver.DataLayer.Migrations
 
                     b.Property<Guid>("EnvironmentSettingId")
                         .HasColumnType("char(36)");
-
-                    b.Property<double>("Value")
-                        .HasColumnType("double");
 
                     b.HasKey("Id");
 
@@ -620,7 +619,7 @@ namespace StoreAndDeliver.DataLayer.Migrations
                     b.Navigation("EnvironmentSetting");
                 });
 
-            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.CargoSnapshot", b =>
+            modelBuilder.Entity("StoreAndDeliver.DataLayer.Models.CargoSnapshots", b =>
                 {
                     b.HasOne("StoreAndDeliver.DataLayer.Models.CargoSession", "CargoSession")
                         .WithMany("CargoSnapshots")

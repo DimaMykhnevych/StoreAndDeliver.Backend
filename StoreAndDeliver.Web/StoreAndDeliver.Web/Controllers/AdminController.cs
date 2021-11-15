@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.AdminService;
+using StoreAndDeliver.DataLayer.Models;
 using System;
 using System.Configuration;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace StoreAndDeliver.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class AdminController : ControllerBase
     {
         private readonly IAdminService _adminService;
@@ -24,6 +25,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpPost("backupDatabase")]
+        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> BackupDatabase()
         {
             await _adminService.BackupDatabase(_connectionString);
@@ -31,6 +33,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpGet("getLogs")]
+        [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> GetLogs([FromQuery] DateTime date)
         {
             LogsDto logs = await _adminService.GetLogs(date);

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
+using StoreAndDeliver.DataLayer.Models;
 using System;
 using System.Threading.Tasks;
 
@@ -8,6 +10,7 @@ namespace StoreAndDeliver.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class StoreController : ControllerBase
     {
         private readonly IStoreService _storeService;
@@ -25,6 +28,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Role.CompanyAdmin)]
         public async Task<IActionResult> CreateStore([FromBody] AddStoreDto storeDto)
         {
             StoreDto addedStore = await _storeService.CreateStore(storeDto);
@@ -32,6 +36,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = Role.CompanyAdmin)]
         public async Task<IActionResult> DeleteStore(Guid id)
         {
             return Ok(await _storeService.DeleteStore(id));
