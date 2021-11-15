@@ -9,7 +9,7 @@ namespace StoreAndDeliver.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class CargoSessionNoteController : ControllerBase
     {
         private readonly ICargoSessionNoteService _cargoSessionNoteService;
