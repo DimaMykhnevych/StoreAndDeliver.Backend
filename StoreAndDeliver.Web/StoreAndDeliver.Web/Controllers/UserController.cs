@@ -7,6 +7,7 @@ using StoreAndDeliver.BusinessLayer.Exceptions;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
 using StoreAndDeliver.DataLayer.Models;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.Web.Controllers
@@ -54,6 +55,26 @@ namespace StoreAndDeliver.Web.Controllers
             if (confirmEmail == null)
                 return BadRequest("Invalid Email Confirmation Request");
             return Ok(confirmEmail);
+        }
+
+        [HttpPut]
+        [Authorize]
+        public async Task<IActionResult> Put([FromBody] UpdateUserDto model)
+        {
+            model.Id = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
+            model.UserName = User.Identity.Name;
+            try
+            {
+                return Ok(await _service.UpdateUserAsync(model));
+            }
+            catch (InvalidUserPasswordException)
+            {
+                return BadRequest(AddModelStateError("password", ErrorMessagesConstants.INVALID_PASSWORD));
+            }
+            catch (UsernameAlreadyTakenException)
+            {
+                return BadRequest(AddModelStateError("username", ErrorMessagesConstants.USERNAME_ALREADY_TAKEN));
+            }
         }
 
         [HttpDelete("{id:guid}")]

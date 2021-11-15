@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
+using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Exceptions;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
@@ -78,6 +79,45 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
             return confirmEmailDto;
         }
 
+        public async Task<AppUser> UpdateUserAsync(UpdateUserDto model)
+        {
+            List<string> errors = new List<string>();
+            Boolean result = ValidatePasswords(model, out errors);
+
+            if (!result)
+            {
+                throw new InvalidUserPasswordException(String.Join(" ", errors));
+            }
+
+            AppUser existingUser = await _userManager.FindByNameAsync(model.UserName);
+            if (existingUser != null && existingUser.Id != model.Id)
+            {
+                throw new UsernameAlreadyTakenException();
+            }
+
+            AppUser user = await _userManager.FindByIdAsync(model.Id.ToString());
+            if (user == null)
+            {
+                throw new UserNotFoundException();
+            }
+
+            _mapper.Map(model, user);
+
+            IdentityResult updateUserResult = await _userManager.UpdateAsync(user);
+            ValidateIdentityResult(updateUserResult);
+
+            if (!String.IsNullOrEmpty(model.NewPassword))
+            {
+                IdentityResult changePasswordsResult = await _userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
+                if (!changePasswordsResult.Succeeded)
+                {
+                    throw new InvalidUserPasswordException(String.Join(" ", errors));
+                }
+            }
+
+            return await GetUserByUsername(user.UserName);
+        }
+
         public async Task DeleteUser(Guid userId)
         {
             AppUser userToDelete = await _userManager.FindByIdAsync(userId.ToString());
@@ -95,6 +135,31 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
                                          .Aggregate((i, j) => i + ";" + j);
                 throw new Exception(errorsMessage);
             }
+        }
+
+        private static bool ValidatePasswords(UpdateUserDto model, out List<String> errors)
+        {
+            errors = new List<string>();
+            if (String.IsNullOrEmpty(model.Password) &&
+                String.IsNullOrEmpty(model.NewPassword) &&
+                String.IsNullOrEmpty(model.ConfirmPassword))
+            {
+                return true;
+            }
+
+            if (String.IsNullOrEmpty(model.Password) ||
+                String.IsNullOrEmpty(model.NewPassword) ||
+                String.IsNullOrEmpty(model.ConfirmPassword))
+            {
+                errors.Add(ErrorMessagesConstants.NOT_ALL_PASS_FIELDS_FILLED);
+            }
+
+            if (!model.NewPassword.Equals(model.ConfirmPassword))
+            {
+                errors.Add(ErrorMessagesConstants.PASSWORDS_DO_NOT_MATCH);
+            }
+
+            return !errors.Any();
         }
     }
 }

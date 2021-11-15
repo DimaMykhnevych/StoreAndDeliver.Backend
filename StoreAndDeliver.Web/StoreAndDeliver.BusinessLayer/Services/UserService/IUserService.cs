@@ -9,6 +9,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.UserService
     {
         Task<AppUser> GetUserByUsername(string username);
         Task<AppUser> CreateUserAsync(CreateUserDto userModel, string language, bool sendConfirmationEmail);
+        Task<AppUser> UpdateUserAsync(UpdateUserDto model);
         Task DeleteUser(Guid userId);
         Task<ConfirmEmailDto> ConfirmEmail(ConfirmEmailDto confirmEmailDto);
     }

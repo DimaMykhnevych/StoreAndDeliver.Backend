@@ -11,6 +11,7 @@ namespace StoreAndDeliver.BusinessLayer.Mappers
             CreateMap<CreateUserDto, AppUser>()
                     .ForMember(u => u.Role, m => m.MapFrom(u => u.Role))
                     .ForMember(u => u.UserName, m => m.MapFrom(u => u.UserName));
+            CreateMap<UpdateUserDto, AppUser>();
 
             CreateMap<EnvironmentSettingDto, EnvironmentSetting>().ReverseMap();
             CreateMap<AddressDto, Address>().ReverseMap();
