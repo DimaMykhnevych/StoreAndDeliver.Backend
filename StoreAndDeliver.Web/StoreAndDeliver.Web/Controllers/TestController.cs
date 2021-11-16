@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 
 namespace StoreAndDeliver.Web.Controllers
 {
@@ -10,7 +14,11 @@ namespace StoreAndDeliver.Web.Controllers
         [Route("test")]
         public IActionResult Test()
         {
-            return Ok("Hello");
+            var name = Dns.GetHostName(); // get container id
+            var ip = Dns.GetHostEntry(name).AddressList.FirstOrDefault(x => x.AddressFamily == AddressFamily.InterNetwork);
+            var port = HttpContext.Connection.LocalPort;
+
+            return Ok($"Host Name: { Environment.MachineName} \t {name}\t {ip}\t Port: {port}");
         }
     }
 }
