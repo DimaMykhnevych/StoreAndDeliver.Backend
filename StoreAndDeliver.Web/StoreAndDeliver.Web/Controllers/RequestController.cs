@@ -50,8 +50,8 @@ namespace StoreAndDeliver.Web.Controllers
             //UNCOMMENT for calulating real price
 
             addRequestDto.CurrentUserId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
-            //decimal price = await _requestService.CalculateRequestPrice(addRequestDto);
-            return Ok(10);
+            decimal price = await _requestService.CalculateRequestPrice(addRequestDto);
+            return Ok(price);
         }
 
         [HttpPut]

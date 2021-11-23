@@ -265,16 +265,16 @@ namespace StoreAndDeliver.BusinessLayer.Services.RequestService
             }
 
             // Converting currency
-            //foreach (var r in requests)
-            //{
-            //    UNCOMMENT to real currency convertion
-            //    if (currentLanguage != Languages.ENGLISH)
-            //    {
-            //        string toCurrency = GetCurrencyUnit(currentLanguage);
-            //        decimal price = await _convertionService.ConvertCurrency(Currency.Usd, toCurrency, keyValue.Value[0].Request.TotalSum);
-            //        keyValue.Value[0].Request.TotalSum = price;
-            //    }
-            //}
+            foreach (var r in requests)
+            {
+                //UNCOMMENT to real currency convertion
+                if (currentLanguage != Languages.ENGLISH)
+                {
+                    string toCurrency = GetCurrencyUnit(currentLanguage);
+                    decimal price = await _convertionService.ConvertCurrency(Currency.Usd, toCurrency, r.TotalSum);
+                    r.TotalSum = price;
+                }
+            }
         }
 
         private async Task SendSuccessfullDeliveryEmail(UpdateCargoRequestsDto updateModel)
