@@ -4,6 +4,7 @@ using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
+using StoreAndDeliver.DataLayer.Repositories.CargoRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository;
 using System;
 using System.Collections.Generic;
@@ -16,14 +17,17 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
     {
         private readonly ICargoSnapshotsRepository _cargoSnapshotsRepository;
         private readonly IConvertionService _convertionService;
+        private readonly ICargoRepository _cargoRepository;
         private readonly IMapper _mapper;
 
         public CargoSnapshotService(ICargoSnapshotsRepository cargoSnapshotsRepository, 
             IMapper mapper,
-            IConvertionService convertionService)
+            IConvertionService convertionService,
+            ICargoRepository cargoRepository)
         {
             _cargoSnapshotsRepository = cargoSnapshotsRepository;
             _convertionService = convertionService;
+            _cargoRepository = cargoRepository;
             _mapper = mapper;
         }
 
@@ -39,19 +43,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
         {
             var cargoSnapshots = await _cargoSnapshotsRepository.GetUserCargoSnapshots(userId);
             ConvertCargoSnapshots(cargoSnapshots, getCargoSnapshotDto);
-            var userCargoSnapshots = cargoSnapshots
+            var userCargoSnapshotsDictionary = cargoSnapshots
                 .ToList()
-                .GroupBy(cs => cs.CargoSession.CargoRequest.Cargo)
-                .ToDictionary(cs => cs.Key, cs => cs.ToList())
-                .Select(cs => new GetUserCargoSnapshotsDto
-                {
-                    Cargo = _mapper.Map<CargoDto>(cs.Key),
-                    CargoSnapshots = _mapper.Map<List<CargoSnapshotDto>>(cs.Value)
-                }).ToList();
-            foreach(var cs in userCargoSnapshots)
+                .GroupBy(cs => cs.CargoSession.CargoRequest.Cargo.Id)
+                .ToDictionary(cs => cs.Key, cs => cs.ToList());
+            var userCargoSnapshots = new List<GetUserCargoSnapshotsDto>();
+            foreach(var k in userCargoSnapshotsDictionary)
             {
-                cs.Cargo.CargoRequests = null;
-                foreach(var snapshot in cs.CargoSnapshots)
+                var cargo = await _cargoRepository.GetCargoWithSettings(k.Key);
+                userCargoSnapshots.Add(new GetUserCargoSnapshotsDto
+                {
+                    Cargo = _mapper.Map<CargoDto>(cargo),
+                    CargoSnapshots = _mapper.Map<List<CargoSnapshotDto>>(k.Value)
+                });
+            }
+            foreach (var cs in  userCargoSnapshots)
+            {
+                foreach (var snapshot in cs.CargoSnapshots)
                 {
                     snapshot.CargoSession = null;
                 }

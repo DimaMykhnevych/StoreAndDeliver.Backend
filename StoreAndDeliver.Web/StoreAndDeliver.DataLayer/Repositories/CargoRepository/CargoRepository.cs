@@ -1,5 +1,8 @@
-﻿using StoreAndDeliver.DataLayer.DbContext;
+﻿using Microsoft.EntityFrameworkCore;
+using StoreAndDeliver.DataLayer.DbContext;
 using StoreAndDeliver.DataLayer.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace StoreAndDeliver.DataLayer.Repositories.CargoRepository
 {
@@ -7,6 +10,15 @@ namespace StoreAndDeliver.DataLayer.Repositories.CargoRepository
     {
         public CargoRepository(StoreAndDeliverDbContext context) : base(context)
         {
+        }
+
+        public async Task<Cargo> GetCargoWithSettings(Guid cargoId)
+        {
+            return await context.Cargo
+                .Include(c => c.CargoSettings)
+                .ThenInclude(c => c.EnvironmentSetting)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.Id == cargoId);
         }
     }
 }
