@@ -7,6 +7,7 @@ using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
@@ -32,6 +33,30 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
                 await _cargoSnapshotsRepository.GetCargoSnapshotsByCargoRequestId(getCargoSnapshotDto.CargoRequestId);
             ConvertCargoSnapshots(cargoSnapshots, getCargoSnapshotDto);
             return _mapper.Map<IEnumerable<CargoSnapshotDto>>(cargoSnapshots);
+        }
+
+        public async Task<IEnumerable<GetUserCargoSnapshotsDto>> GetUserCargoSnapshots(Guid userId, GetCargoSnapshotDto getCargoSnapshotDto)
+        {
+            var cargoSnapshots = await _cargoSnapshotsRepository.GetUserCargoSnapshots(userId);
+            ConvertCargoSnapshots(cargoSnapshots, getCargoSnapshotDto);
+            var userCargoSnapshots = cargoSnapshots
+                .ToList()
+                .GroupBy(cs => cs.CargoSession.CargoRequest.Cargo)
+                .ToDictionary(cs => cs.Key, cs => cs.ToList())
+                .Select(cs => new GetUserCargoSnapshotsDto
+                {
+                    Cargo = _mapper.Map<CargoDto>(cs.Key),
+                    CargoSnapshots = _mapper.Map<List<CargoSnapshotDto>>(cs.Value)
+                }).ToList();
+            foreach(var cs in userCargoSnapshots)
+            {
+                cs.Cargo.CargoRequests = null;
+                foreach(var snapshot in cs.CargoSnapshots)
+                {
+                    snapshot.CargoSession = null;
+                }
+            }
+            return userCargoSnapshots;
         }
 
         public async Task<IEnumerable<CargoSnapshotDto>> GetCargoSnapshotsByCargoSessionId(Guid cargoSessionId)

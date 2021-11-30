@@ -7,6 +7,7 @@ namespace StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository
 {
     public interface ICargoSnapshotsRepository : IRepository<CargoSnapshot>
     {
+        Task<IEnumerable<CargoSnapshot>> GetUserCargoSnapshots(Guid userId);
         Task<IEnumerable<CargoSnapshot>> GetCargoSnapshotsByCargoRequestId(Guid cargoRequestId);
         Task<IEnumerable<CargoSnapshot>> GetCargoSnapshotsByCargoSessionId(Guid cargoSessionId);
     }

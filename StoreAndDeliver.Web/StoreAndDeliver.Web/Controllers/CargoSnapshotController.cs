@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.Web.Controllers
@@ -15,6 +17,14 @@ namespace StoreAndDeliver.Web.Controllers
         public CargoSnapshotController(ICargoSnapshotService cargoSnapshotService)
         {
             _cargoSnapshotService = cargoSnapshotService;
+        }
+
+        [HttpGet("getUserCargoSnapshots")]
+        public async Task<IActionResult> GetUserCargoSnapsots([FromQuery] GetCargoSnapshotDto getCargoSnapshotDto)
+        {
+            var userId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
+            var result = await _cargoSnapshotService.GetUserCargoSnapshots(userId, getCargoSnapshotDto);
+            return Ok(result);
         }
 
         [HttpGet("getSnapshotsByCargoRequestId")]

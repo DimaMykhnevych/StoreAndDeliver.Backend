@@ -14,6 +14,24 @@ namespace StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository
         {
         }
 
+        public async Task<IEnumerable<CargoSnapshot>> GetUserCargoSnapshots(Guid userId)
+        {
+            return await context.CargoSnapshots
+                .Include(c => c.EnvironmentSetting)
+                .Include(c => c.CargoSession)
+                .ThenInclude(c => c.CargoRequest)
+                .ThenInclude(c => c.Request)
+                .AsNoTracking()
+                .Include(c => c.CargoSession)
+                .ThenInclude(c => c.CargoRequest)
+                .ThenInclude(c => c.Cargo)
+                .ThenInclude(c => c.CargoSettings)
+                .ThenInclude(c => c.EnvironmentSetting)
+                .AsNoTracking()
+                .Where(c => c.CargoSession.CargoRequest.Request.AppUserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<CargoSnapshot>> GetCargoSnapshotsByCargoRequestId(Guid cargoRequestId)
         {
             return await context.CargoSnapshots
