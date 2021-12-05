@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace StoreAndDeliver.DataLayer.Repositories.BackupRepository
 {
     public interface IBackupRepository
     {
-        Task BackupDatabase(string connectionString);
+        Task<Stream> BackupDatabase(string connectionString);
     }
 }

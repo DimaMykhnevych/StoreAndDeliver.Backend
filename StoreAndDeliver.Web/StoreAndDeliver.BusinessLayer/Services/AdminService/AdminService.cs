@@ -2,6 +2,7 @@
 using StoreAndDeliver.DataLayer.Repositories.BackupRepository;
 using StoreAndDeliver.DataLayer.Repositories.LogsRepository;
 using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.BusinessLayer.Services.AdminService
@@ -17,9 +18,9 @@ namespace StoreAndDeliver.BusinessLayer.Services.AdminService
             _logsRepository = logsRepository;
         }
 
-        public async Task BackupDatabase(string connectionString)
+        public async Task<Stream> BackupDatabase(string connectionString)
         {
-            await _backupRepository.BackupDatabase(connectionString);
+            return await _backupRepository.BackupDatabase(connectionString);
         }
 
         public async Task<LogsDto> GetLogs(DateTime logDate)

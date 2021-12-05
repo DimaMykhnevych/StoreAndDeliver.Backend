@@ -6,6 +6,7 @@ using StoreAndDeliver.BusinessLayer.Services.AdminService;
 using StoreAndDeliver.DataLayer.Models;
 using System;
 using System.Configuration;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace StoreAndDeliver.Web.Controllers
@@ -24,12 +25,12 @@ namespace StoreAndDeliver.Web.Controllers
             _connectionString = configuration["ConnectionStrings:Default"];
         }
 
-        [HttpPost("backupDatabase")]
+        [HttpGet("backupDatabase")]
         [Authorize(Roles = Role.Admin)]
         public async Task<IActionResult> BackupDatabase()
         {
-            await _adminService.BackupDatabase(_connectionString);
-            return Ok();
+            Stream result = await _adminService.BackupDatabase(_connectionString);
+            return File(result, "application/octet-stream");
         }
 
         [HttpGet("getLogs")]

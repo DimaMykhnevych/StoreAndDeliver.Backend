@@ -19,7 +19,7 @@ namespace StoreAndDeliver.DataLayer.Repositories.BackupRepository
             _logger = loggerFactory?.CreateLogger("BackupRepository");
         }
 
-        public async Task BackupDatabase(string connectionString)
+        public async Task<Stream> BackupDatabase(string connectionString)
         {
             string fullPathToBackupFolder = Path.Combine(_appDataFolder, _backupFolderPath);
             _logger.LogInformation($"fullPathToBackupFolder: {fullPathToBackupFolder}");
@@ -65,6 +65,8 @@ namespace StoreAndDeliver.DataLayer.Repositories.BackupRepository
                 conn.Close();
                 _logger.LogInformation($"Backup was created successfully");
             }
+            Stream fs = File.OpenRead(pathToBackupFile);
+            return fs;
         }
 
         private static async Task<string> GetMySqlWorkingDirectory(string connectionString)
