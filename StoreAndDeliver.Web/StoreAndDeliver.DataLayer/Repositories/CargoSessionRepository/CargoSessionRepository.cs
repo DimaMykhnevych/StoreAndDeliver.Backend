@@ -21,6 +21,7 @@ namespace StoreAndDeliver.DataLayer.Repositories.CargoSessionRepository
                 .FirstOrDefaultAsync(cs => cs.CargoRequestId == cargoRequestId);
         }
 
+
         public async Task<IEnumerable<CargoRequest>> GetCarrierCargoRequests(Guid carrierId, RequestType requestType)
         {
             return await context.CargoSessions

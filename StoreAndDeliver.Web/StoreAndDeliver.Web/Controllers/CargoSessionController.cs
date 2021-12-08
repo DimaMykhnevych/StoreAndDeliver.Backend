@@ -27,5 +27,14 @@ namespace StoreAndDeliver.Web.Controllers
             var result = await _cargoSessionService.GetCarrierRequests(carrierId, getOptimizedRequestDto);
             return Ok(result);
         }
+
+        [HttpPost]
+        [Route("carrierSessionRequests")]
+        public async Task<IActionResult> GetCarrierSessionRequests([FromBody] GetRequestDto getRequestDto)
+        {
+            Guid carrierId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
+            var result = await _cargoSessionService.GetCarrierSessionRequests(carrierId, getRequestDto);
+            return Ok(result);
+        }
     }
 }

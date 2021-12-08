@@ -8,5 +8,6 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSessionService
     public interface ICargoSessionService
     {
         Task<Dictionary<Guid, List<CargoRequestDto>>> GetCarrierRequests(Guid userId, GetRequestDto getRequestDto);
+        Task<RequestsForIotDto> GetCarrierSessionRequests(Guid userId, GetRequestDto getRequestDto);
     }
 }
