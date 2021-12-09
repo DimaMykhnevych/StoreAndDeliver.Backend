@@ -6,6 +6,6 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
     public class RequestsForIotDto
     {
         public IEnumerable<CargoRequestDto> CargoRequests { get; set; }
-        public Dictionary<string, SettingsBoundDto> SettingsBound { get; set; }
+        public IEnumerable<IoTSettingBoundDto> SettingsBound { get; set; }
     }
 }
