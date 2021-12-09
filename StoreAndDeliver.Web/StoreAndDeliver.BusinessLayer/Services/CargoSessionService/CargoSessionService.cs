@@ -50,10 +50,13 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSessionService
                 .ToDictionary(k => k.Key, v => v.ToList());
             requests.Add(cargoRequestsDictionary);
             await _requestService.ConvertRequestsValues(requests, getRequestDto.Units, getRequestDto.CurrentLanguage);
-            var requestsForIot = new RequestsForIotDto();
-            requestsForIot.CargoRequests = _mapper.Map<IEnumerable<CargoRequestDto>>(cargoRequests);
+            var requestsForIot = new RequestsForIotDto
+            {
+                CargoRequests = _mapper.Map<IEnumerable<CargoRequestIoTDto>>(cargoRequests)
+            };
             var settingsBound = _cargoService
-                .GetCargoSettingsBound(requestsForIot.CargoRequests.Select(c => c.Cargo));
+                .GetCargoSettingsBound((_mapper.Map<IEnumerable<CargoRequestDto>>(cargoRequests))
+                .Select(c => c.Cargo));
             requestsForIot.SettingsBound = settingsBound.Select(c => new IoTSettingBoundDto { 
                 Setting = c.Key,
                 MaxValue = c.Value.MaxValue,

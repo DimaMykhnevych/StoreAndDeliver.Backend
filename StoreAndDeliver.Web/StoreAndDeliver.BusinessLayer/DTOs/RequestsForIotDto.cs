@@ -5,7 +5,7 @@ namespace StoreAndDeliver.BusinessLayer.DTOs
 {
     public class RequestsForIotDto
     {
-        public IEnumerable<CargoRequestDto> CargoRequests { get; set; }
+        public IEnumerable<CargoRequestIoTDto> CargoRequests { get; set; }
         public IEnumerable<IoTSettingBoundDto> SettingsBound { get; set; }
     }
 }
