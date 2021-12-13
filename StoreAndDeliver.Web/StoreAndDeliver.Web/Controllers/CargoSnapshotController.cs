@@ -47,5 +47,14 @@ namespace StoreAndDeliver.Web.Controllers
             var result = await _cargoSnapshotService.AddCargoSnapshot(addCargoSnapshotDto);
             return Ok(result);
         }
+
+        [HttpPost("addCurrentCarrierSessionSnapshots")]
+        public async Task<IActionResult> AddCurrentCarrierCargoSnapshots(
+            [FromBody] AddCurrentCarrierCargoSnapshotDto cargoSnapshotDto)
+        {
+            var userId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
+            var result = await _cargoSnapshotService.AddCurrentCarrierCargoSnapshots(userId, cargoSnapshotDto);
+            return Ok(result);
+        }
     }
 }

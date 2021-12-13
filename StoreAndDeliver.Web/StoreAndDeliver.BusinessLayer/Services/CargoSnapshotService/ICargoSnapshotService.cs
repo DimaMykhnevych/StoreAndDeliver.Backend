@@ -10,6 +10,8 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
         Task<IEnumerable<GetUserCargoSnapshotsDto>> GetUserCargoSnapshots(Guid userId, GetCargoSnapshotDto getCargoSnapshotDto);
         Task<IEnumerable<CargoSnapshotDto>> GetCargoSnapshotsByCargoRequestId(GetCargoSnapshotDto getCargoSnapshotDto);
         Task<IEnumerable<CargoSnapshotDto>> GetCargoSnapshotsByCargoSessionId(Guid cargoSessionId);
+        Task<bool> AddCurrentCarrierCargoSnapshots(
+            Guid appUserId, AddCurrentCarrierCargoSnapshotDto cargoSnapshotDto);
         Task<CargoSnapshotDto> AddCargoSnapshot(AddCargoSnapshotDto addCargoSnapshotDto);
     }
 }

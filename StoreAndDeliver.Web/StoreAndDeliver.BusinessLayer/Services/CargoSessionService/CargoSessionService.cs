@@ -66,6 +66,18 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSessionService
 
         }
 
+        public IEnumerable<CargoSessionDto> GetCarrierActiveCargoSessions(Guid carrierId, RequestType requestType)
+        {
+            var cargoSessions = _queryBuilder
+               .SetBaseCargoSessionInfo()
+               .SetCargoSessionCarrier(carrierId)
+               .SetCargoSessionRequestStatus(RequestStatus.InProgress)
+               .SetCargoSessionRequestType(requestType)
+               .Build()
+               .ToList();
+            return _mapper.Map<IEnumerable<CargoSessionDto>>(cargoSessions);
+        }
+
         public async Task<Dictionary<Guid, List<CargoRequestDto>>> GetCarrierRequests
             (Guid userId, GetRequestDto getRequestDto)
         {

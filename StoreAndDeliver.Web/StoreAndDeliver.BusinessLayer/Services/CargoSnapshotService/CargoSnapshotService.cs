@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
+using StoreAndDeliver.BusinessLayer.Services.CargoSessionService;
+using StoreAndDeliver.BusinessLayer.Services.CarrierService;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.DataLayer.Enums;
 using StoreAndDeliver.DataLayer.Models;
 using StoreAndDeliver.DataLayer.Repositories.CargoRepository;
 using StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository;
+using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,22 +21,31 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
         private readonly ICargoSnapshotsRepository _cargoSnapshotsRepository;
         private readonly IConvertionService _convertionService;
         private readonly ICargoRepository _cargoRepository;
+        private readonly ICarrierService _carrierService;
+        private readonly ICargoSessionService _cargoSessionService;
+        private readonly IEnvironmentSettingRepository _environmentSettingRepository;
         private readonly IMapper _mapper;
 
-        public CargoSnapshotService(ICargoSnapshotsRepository cargoSnapshotsRepository, 
+        public CargoSnapshotService(ICargoSnapshotsRepository cargoSnapshotsRepository,
             IMapper mapper,
             IConvertionService convertionService,
-            ICargoRepository cargoRepository)
+            ICarrierService carrierService,
+            ICargoRepository cargoRepository,
+            ICargoSessionService cargoSessionService,
+            IEnvironmentSettingRepository environmentSettingRepository)
         {
             _cargoSnapshotsRepository = cargoSnapshotsRepository;
             _convertionService = convertionService;
             _cargoRepository = cargoRepository;
+            _carrierService = carrierService;
+            _cargoSessionService = cargoSessionService;
+            _environmentSettingRepository = environmentSettingRepository;
             _mapper = mapper;
         }
 
         public async Task<IEnumerable<CargoSnapshotDto>> GetCargoSnapshotsByCargoRequestId(GetCargoSnapshotDto getCargoSnapshotDto)
         {
-            IEnumerable<CargoSnapshot> cargoSnapshots = 
+            IEnumerable<CargoSnapshot> cargoSnapshots =
                 await _cargoSnapshotsRepository.GetCargoSnapshotsByCargoRequestId(getCargoSnapshotDto.CargoRequestId);
             ConvertCargoSnapshots(cargoSnapshots, getCargoSnapshotDto);
             return _mapper.Map<IEnumerable<CargoSnapshotDto>>(cargoSnapshots);
@@ -48,7 +60,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
                 .GroupBy(cs => cs.CargoSession.CargoRequest.Cargo.Id)
                 .ToDictionary(cs => cs.Key, cs => cs.ToList());
             var userCargoSnapshots = new List<GetUserCargoSnapshotsDto>();
-            foreach(var k in userCargoSnapshotsDictionary)
+            foreach (var k in userCargoSnapshotsDictionary)
             {
                 var cargo = await _cargoRepository.GetCargoWithSettings(k.Key);
                 userCargoSnapshots.Add(new GetUserCargoSnapshotsDto
@@ -57,7 +69,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
                     CargoSnapshots = _mapper.Map<List<CargoSnapshotDto>>(k.Value)
                 });
             }
-            foreach (var cs in  userCargoSnapshots)
+            foreach (var cs in userCargoSnapshots)
             {
                 foreach (var snapshot in cs.CargoSnapshots)
                 {
@@ -74,6 +86,40 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
             return _mapper.Map<IEnumerable<CargoSnapshotDto>>(cargoSnapshots);
         }
 
+        public async Task<bool> AddCurrentCarrierCargoSnapshots(
+            Guid appUserId, AddCurrentCarrierCargoSnapshotDto cargoSnapshotDto)
+        {
+            CarrierDto carrier = await _carrierService.GetCarrierByAppUserId(appUserId);
+            var carrierActiveSessions = _cargoSessionService.GetCarrierActiveCargoSessions(carrier.Id, cargoSnapshotDto.RequestType);
+            var envSettings = await _environmentSettingRepository.GetAll();
+            foreach (var session in carrierActiveSessions)
+            {
+                var addCargoSnapshotDtos = new List<AddCargoSnapshotDto>
+                {
+                    new()
+                    {
+                        CargoSessionId = session.Id,
+                        EnvironmentSettingId = envSettings.FirstOrDefault(s => s.Name == SettingsConstants.TEMPERATURE).Id,
+                        Value = cargoSnapshotDto.Temperature
+                    },
+                    new()
+                    {
+                        CargoSessionId = session.Id,
+                        EnvironmentSettingId = envSettings.FirstOrDefault(s => s.Name == SettingsConstants.HUMIDITY).Id,
+                        Value = cargoSnapshotDto.Humidity
+                    },
+                    new()
+                    {
+                        CargoSessionId = session.Id,
+                        EnvironmentSettingId = envSettings.FirstOrDefault(s => s.Name == SettingsConstants.LUMINOSITY).Id,
+                        Value = cargoSnapshotDto.Luminosity
+                    },
+                };
+                await AddCargoSnapshotRange(addCargoSnapshotDtos);
+            }
+            return true;
+        }
+
         public async Task<CargoSnapshotDto> AddCargoSnapshot(AddCargoSnapshotDto addCargoSnapshotDto)
         {
             CargoSnapshot cargoSnapshot = _mapper.Map<CargoSnapshot>(addCargoSnapshotDto);
@@ -81,6 +127,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
             CargoSnapshot added = await _cargoSnapshotsRepository.Insert(cargoSnapshot);
             await _cargoSnapshotsRepository.Save();
             return _mapper.Map<CargoSnapshotDto>(added);
+        }
+
+        private async Task<bool> AddCargoSnapshotRange(IEnumerable<AddCargoSnapshotDto> addCargoSnapshotDtos)
+        {
+            foreach (var snapshot in addCargoSnapshotDtos)
+            {
+                try
+                {
+                    await AddCargoSnapshot(snapshot);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void ConvertCargoSnapshots(IEnumerable<CargoSnapshot> cargoSnapshots, GetCargoSnapshotDto cargoSnapshotDto)
@@ -93,7 +156,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
             };
             foreach (var snapshot in cargoSnapshots)
             {
-                if(snapshot.EnvironmentSetting.Name == SettingsConstants.TEMPERATURE)
+                if (snapshot.EnvironmentSetting.Name == SettingsConstants.TEMPERATURE)
                 {
                     snapshot.Value = _convertionService
                         .ConvertTemperature(unitsFrom.Temperature, cargoSnapshotDto.Temperature, snapshot.Value);
