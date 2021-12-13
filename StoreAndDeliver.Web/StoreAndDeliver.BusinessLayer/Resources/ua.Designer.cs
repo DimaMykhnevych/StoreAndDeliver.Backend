@@ -106,6 +106,24 @@ namespace StoreAndDeliver.BusinessLayer.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Виявлено Рух.
+        /// </summary>
+        internal static string MotionDetected {
+            get {
+                return ResourceManager.GetString("MotionDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Увага! На складі було виявлено рух!.
+        /// </summary>
+        internal static string MotionDetectedMainContent {
+            get {
+                return ResourceManager.GetString("MotionDetectedMainContent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Збереження.
         /// </summary>
         internal static string Store {

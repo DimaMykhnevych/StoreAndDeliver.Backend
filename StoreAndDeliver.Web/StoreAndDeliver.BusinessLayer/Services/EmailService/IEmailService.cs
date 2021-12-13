@@ -8,5 +8,6 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
     {
         Task SendEmail(AppUser receiver, string url, string language);
         Task SendSuccessfullDeliveryEmail(Dictionary<AppUser, List<CargoRequest>> cargoRequests, string language);
+        Task SendMotionDetectedEmail(string username, string language);
     }
 }

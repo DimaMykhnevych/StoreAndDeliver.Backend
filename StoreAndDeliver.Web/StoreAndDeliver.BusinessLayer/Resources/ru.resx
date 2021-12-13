@@ -132,6 +132,12 @@
   <data name="Hello" xml:space="preserve">
     <value>Добрый день,</value>
   </data>
+  <data name="MotionDetected" xml:space="preserve">
+    <value>Обнаружено движение</value>
+  </data>
+  <data name="MotionDetectedMainContent" xml:space="preserve">
+    <value>Внимание! На складе было обнаружено движение!</value>
+  </data>
   <data name="Store" xml:space="preserve">
     <value>Хранение</value>
   </data>

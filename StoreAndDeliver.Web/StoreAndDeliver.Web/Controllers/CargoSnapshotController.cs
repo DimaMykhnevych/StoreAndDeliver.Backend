@@ -2,6 +2,7 @@
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService;
+using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,10 +14,12 @@ namespace StoreAndDeliver.Web.Controllers
     public class CargoSnapshotController : ControllerBase
     {
         private readonly ICargoSnapshotService _cargoSnapshotService;
+        private readonly IEmailService _emailService;
 
-        public CargoSnapshotController(ICargoSnapshotService cargoSnapshotService)
+        public CargoSnapshotController(ICargoSnapshotService cargoSnapshotService, IEmailService emailService)
         {
             _cargoSnapshotService = cargoSnapshotService;
+            _emailService = emailService;
         }
 
         [HttpGet("getUserCargoSnapshots")]
@@ -55,6 +58,13 @@ namespace StoreAndDeliver.Web.Controllers
             var userId = new Guid(User.FindFirstValue(AuthorizationConstants.ID));
             var result = await _cargoSnapshotService.AddCurrentCarrierCargoSnapshots(userId, cargoSnapshotDto);
             return Ok(result);
+        }
+
+        [HttpPost("sendMotionDetectedEmail/{language}")]
+        public async Task<IActionResult> SendMotionDetectedEmail(string language)
+        {
+            await _emailService.SendMotionDetectedEmail(User.Identity.Name, language);
+            return Ok();
         }
     }
 }

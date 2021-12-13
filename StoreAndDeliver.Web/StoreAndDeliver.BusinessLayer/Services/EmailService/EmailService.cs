@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.Options;
 using StoreAndDeliver.BusinessLayer.Resources;
 using StoreAndDeliver.DataLayer.Models;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
@@ -15,10 +18,17 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
     public class EmailService : IEmailService
     {
         private readonly EmailServiceOptions _emailServiceDetails;
+        private readonly ILogger _logger;
+        private readonly UserManager<AppUser> _userManager;
 
-        public EmailService(IOptions<EmailServiceOptions> options)
+
+        public EmailService(IOptions<EmailServiceOptions> options, 
+            ILoggerFactory loggerFactory,
+            UserManager<AppUser> userManager)
         {
             _emailServiceDetails = options.Value;
+            _userManager = userManager;
+            _logger = loggerFactory?.CreateLogger("EmailService");
         }
 
         public async Task SendEmail(AppUser user, string url, string language)
@@ -50,7 +60,57 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
                 Credentials = new NetworkCredential(_emailServiceDetails.EmailAddress, _emailServiceDetails.Password),
                 EnableSsl = true
             };
-            await smtp.SendMailAsync(message);
+            try
+            {
+                _logger.LogInformation($"Sending confirmation email to {user.Email}");
+                await smtp.SendMailAsync(message);
+                _logger.LogInformation($"Confirmation email was sent successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"An error occured when sending confirmation email to {user.Email}: {ex.Message}");
+            }
+        }
+
+        public async Task SendMotionDetectedEmail(string username, string language)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            MailAddress addressFrom = new MailAddress(_emailServiceDetails.EmailAddress, "Store&Deliver");
+            MailAddress addressTo = new MailAddress(user.Email);
+            MailMessage message = new MailMessage(addressFrom, addressTo);
+
+            ResourceManager resourceManager = GetResourceManager(language);
+
+            message.Subject = resourceManager.GetString("MotionDetected");
+            message.IsBodyHtml = true;
+            string htmlString = @$"<html>
+                      <body style='background-color: #f7f1d5; 
+                        padding: 15px; border-radius: 15px; 
+                        box-shadow: 5px 5px 15px 5px #9F9F9F;
+                        font-size: 16px;'>
+                      <p>{resourceManager.GetString("Hello")} {user.UserName},</p>
+                      <p>{resourceManager.GetString("MotionDetectedMainContent")}</p>
+                      <p>{resourceManager.GetString("ThankYou")},<br>-Store&Deliver</br></p>
+                      </body>
+                      </html>
+                     ";
+            message.Body = htmlString;
+
+            SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)
+            {
+                Credentials = new NetworkCredential(_emailServiceDetails.EmailAddress, _emailServiceDetails.Password),
+                EnableSsl = true
+            };
+            try
+            {
+                _logger.LogInformation($"Sending motion detected email to {user.Email}");
+                await smtp.SendMailAsync(message);
+                _logger.LogInformation($"Motion detected email was sent successfully");
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"An error occured when sending motion detected email to {user.Email}: {ex.Message}");
+            }
         }
 
         public async Task SendSuccessfullDeliveryEmail(Dictionary<AppUser, List<CargoRequest>> cargoRequests, string language)
@@ -99,7 +159,16 @@ namespace StoreAndDeliver.BusinessLayer.Services.EmailService
                     Credentials = new NetworkCredential(_emailServiceDetails.EmailAddress, _emailServiceDetails.Password),
                     EnableSsl = true
                 };
-                await smtp.SendMailAsync(message);
+                try
+                {
+                    _logger.LogInformation($"Sending successfully deliver email");
+                    await smtp.SendMailAsync(message);
+                    _logger.LogInformation($"Successfully deliver email was send successfully");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"An error occured when sending successfully deliver email: {ex.Message}");
+                }
             }
         }
 

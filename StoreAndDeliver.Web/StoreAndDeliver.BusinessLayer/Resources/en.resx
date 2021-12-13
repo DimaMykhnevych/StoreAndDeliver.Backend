@@ -132,6 +132,12 @@
   <data name="Hello" xml:space="preserve">
     <value>Hello</value>
   </data>
+  <data name="MotionDetected" xml:space="preserve">
+    <value>Motion Detected</value>
+  </data>
+  <data name="MotionDetectedMainContent" xml:space="preserve">
+    <value>Warning! Motion was detected in the warehouse!</value>
+  </data>
   <data name="Store" xml:space="preserve">
     <value>Store</value>
   </data>
