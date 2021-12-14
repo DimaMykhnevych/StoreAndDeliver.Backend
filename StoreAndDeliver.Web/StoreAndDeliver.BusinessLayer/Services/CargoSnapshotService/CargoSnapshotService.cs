@@ -63,11 +63,13 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
             foreach (var k in userCargoSnapshotsDictionary)
             {
                 var cargo = await _cargoRepository.GetCargoWithSettings(k.Key);
-                userCargoSnapshots.Add(new GetUserCargoSnapshotsDto
+                var getUserCargoSnapshotDto = new GetUserCargoSnapshotsDto
                 {
                     Cargo = _mapper.Map<CargoDto>(cargo),
                     CargoSnapshots = _mapper.Map<List<CargoSnapshotDto>>(k.Value)
-                });
+                };
+                await ConvertCargoTemperatureSetting(getUserCargoSnapshotDto.Cargo.CargoSettings, getCargoSnapshotDto.Temperature);
+                userCargoSnapshots.Add(getUserCargoSnapshotDto);
             }
             foreach (var cs in userCargoSnapshots)
             {
@@ -127,6 +129,31 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoSnapshotService
             CargoSnapshot added = await _cargoSnapshotsRepository.Insert(cargoSnapshot);
             await _cargoSnapshotsRepository.Save();
             return _mapper.Map<CargoSnapshotDto>(added);
+        }
+
+        public async Task ConvertCargoTemperatureSetting(IEnumerable<CargoSetting> settings, TemperatureUnit temperature)
+        {
+            Units unitsFrom = new Units()
+            {
+                Weight = WeightUnit.Kilograms,
+                Length = LengthUnit.Meters,
+                Temperature = TemperatureUnit.Celsius,
+                Luminosity = LuminosityUnit.Lux,
+                Humidity = HumidityUnit.Percentage
+            };
+            var envSettings = await _environmentSettingRepository.GetAll();
+            var temperatureId = envSettings.FirstOrDefault(s => s.Name == SettingsConstants.TEMPERATURE).Id;
+            foreach (var setting in settings)
+            {
+                if (setting.EnvironmentSettingId == temperatureId)
+                {
+                    setting.MaxValue = _convertionService
+                        .ConvertTemperature(unitsFrom.Temperature, temperature, setting.MaxValue);
+                    setting.MinValue = _convertionService
+                        .ConvertTemperature(unitsFrom.Temperature, temperature, setting.MinValue);
+                }
+            }
+
         }
 
         private async Task<bool> AddCargoSnapshotRange(IEnumerable<AddCargoSnapshotDto> addCargoSnapshotDtos)
