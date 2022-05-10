@@ -12,6 +12,7 @@ namespace StoreAndDeliver.Web.Installers
             services.Configure<MySqlConfigOptions>(configuration.GetSection("ConnectionStrings:Default"));
             services.Configure<EmailServiceOptions>(configuration.GetSection("EmailServiceOptions"));
             services.Configure<ExchangeRatesApiOptions>(configuration.GetSection("ExchangeRatesApiOptions"));
+            services.Configure<AzureStorageAccountOptions>(configuration.GetSection("AzureStorageAccountOptions"));
         }
     }
 }

@@ -6,6 +6,7 @@ using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
 using StoreAndDeliver.BusinessLayer.Services.AdminService;
 using StoreAndDeliver.BusinessLayer.Services.AuthorizationService;
+using StoreAndDeliver.BusinessLayer.Services.AzureBlobService;
 using StoreAndDeliver.BusinessLayer.Services.CargoRequestService;
 using StoreAndDeliver.BusinessLayer.Services.CargoService;
 using StoreAndDeliver.BusinessLayer.Services.CargoSessionNoteService;
@@ -65,6 +66,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<ICargoSnapshotService, CargoSnapshotService>();
             services.AddTransient<ICargoSessionNoteService, CargoSessionNoteService>();
+            services.AddTransient<IAzureBlobService, AzureBlobService>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
