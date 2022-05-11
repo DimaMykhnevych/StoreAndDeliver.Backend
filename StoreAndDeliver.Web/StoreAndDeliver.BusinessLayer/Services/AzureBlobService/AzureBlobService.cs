@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Sas;
@@ -22,7 +23,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.AzureBlobService
             _logger = loggerFactory?.CreateLogger("Carrier Service");
         }
 
-        public async Task<GetCargoPhotosDto> GetCargoPhotos(Guid cargoRequestId)
+        public async Task<IEnumerable<CargoPhotoDto>> GetCargoPhotos(Guid cargoRequestId)
         {
             _logger.LogInformation($"Start getting photos for cargo request with id: {cargoRequestId}");
             BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageAccountOptions.ConnectionString);
@@ -33,13 +34,16 @@ namespace StoreAndDeliver.BusinessLayer.Services.AzureBlobService
                 Resource = "b"
             };
             sasBuilder.SetPermissions(BlobAccountSasPermissions.Read);
-            var results = new List<string>();
+            var results = new List<CargoPhotoDto>();
             await foreach (var blob in container.GetBlobsAsync(prefix: cargoRequestId.ToString()))
             {
                 BlobClient blobClient = container.GetBlobClient(blob.Name);
-                results.Add(blobClient.GenerateSasUri(sasBuilder).ToString());
+                results.Add(new() { 
+                    PhotoUrl = blobClient.GenerateSasUri(sasBuilder).ToString(),
+                    Date = blobClient.GetProperties().Value.CreatedOn.LocalDateTime,
+                });
             }
-            return new GetCargoPhotosDto { PhotoUrls = results };
+            return results.OrderBy(p => p.Date);
         }
     }
 }
