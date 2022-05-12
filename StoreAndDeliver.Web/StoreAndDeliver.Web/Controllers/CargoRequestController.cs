@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.AzureBlobService;
 using StoreAndDeliver.BusinessLayer.Services.CargoRequestService;
+using StoreAndDeliver.DataLayer.Models;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -38,6 +40,15 @@ namespace StoreAndDeliver.Web.Controllers
         public async Task<IActionResult> GetCargoPhotos(Guid cargoRequestId)
         {
             var result = await _azureBlobService.GetCargoPhotos(cargoRequestId);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("uploadCargoPhoto/{cargoRequestId}")]
+        [Authorize(Roles = Role.Carrier)]
+        public async Task<IActionResult> UploadCargoPhoto(Guid cargoRequestId, [FromForm] IFormFile file)
+        {
+            var result = await _azureBlobService.UploadCargoPhoto(cargoRequestId, file);
             return Ok(result);
         }
     }
