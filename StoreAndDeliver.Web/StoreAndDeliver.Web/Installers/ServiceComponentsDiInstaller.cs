@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StoreAndDeliver.BusinessLayer.Calculations.Algorithms;
+using StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms;
 using StoreAndDeliver.BusinessLayer.Clients.ExchangerApiClient;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
@@ -60,13 +61,16 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICargoService, CargoService>();
             services.AddTransient<IStoreService, StoreService>();
             services.AddTransient<ICarrierService, CarrierService>();
-            services.AddTransient<IRequestAlgorithms, RequestAlgorithms>();
             services.AddTransient<ICargoSessionService, CargoSessionService>();
             services.AddTransient<ICargoRequestService, CargoRequestService>();
             services.AddTransient<IAdminService, AdminService>();
             services.AddTransient<ICargoSnapshotService, CargoSnapshotService>();
             services.AddTransient<ICargoSessionNoteService, CargoSessionNoteService>();
             services.AddTransient<IAzureBlobService, AzureBlobService>();
+
+            // optimization and calculations
+            services.AddTransient<IStoreAlgorithms, StoreAlgorithms>();
+            services.AddTransient<IRequestAlgorithms, RequestAlgorithms>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();

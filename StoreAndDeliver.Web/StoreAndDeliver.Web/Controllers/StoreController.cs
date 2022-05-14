@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.DataLayer.Models;
@@ -14,10 +15,12 @@ namespace StoreAndDeliver.Web.Controllers
     public class StoreController : ControllerBase
     {
         private readonly IStoreService _storeService;
+        private readonly IStoreAlgorithms _storeAlgorithms;
 
-        public StoreController(IStoreService storeService)
+        public StoreController(IStoreService storeService, IStoreAlgorithms storeAlgorithms)
         {
             _storeService = storeService;
+            _storeAlgorithms = storeAlgorithms;
         }
 
         [HttpGet]
@@ -25,6 +28,14 @@ namespace StoreAndDeliver.Web.Controllers
         {
             var stores = await _storeService.GetStores();
             return Ok(stores);
+        }
+        [HttpGet]
+        [Authorize(Roles = Role.CompanyAdmin)]
+        [Route("getOptimalStoreLocation")]
+        public async Task<IActionResult> GetOptimalStoreLocation()
+        {
+            var location = await _storeAlgorithms.GetOptimalStoreLocations();
+            return Ok(location);
         }
 
         [HttpPost]

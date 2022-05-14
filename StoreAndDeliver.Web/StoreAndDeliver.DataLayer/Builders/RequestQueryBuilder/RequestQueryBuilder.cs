@@ -42,6 +42,14 @@ namespace StoreAndDeliver.DataLayer.Builders.RequestQueryBuilder
             return this;
         }
 
+        public IRequestQueryBuilder SetRequestAddressInfo()
+        {
+            _query = _dbContext.Requests
+                .Include(r => r.FromAddress)
+                .Include(r => r.ToAddress);
+            return this;
+        }
+
         public IRequestQueryBuilder SetRequestId(Guid id)
         {
             _query = _query.Where(r => r.Id == id);

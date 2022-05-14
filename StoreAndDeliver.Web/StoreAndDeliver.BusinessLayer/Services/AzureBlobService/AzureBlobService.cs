@@ -52,7 +52,7 @@ namespace StoreAndDeliver.BusinessLayer.Services.AzureBlobService
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageAccountOptions.ConnectionString);
             var container = blobServiceClient.GetBlobContainerClient(AzureStorageConstants.CargoPhotosContainerName);
-            //TODO CHECK
+
             if (!photo.ContentType.Contains("image") || photo.Length <= 0) {
                 return false;
             }
