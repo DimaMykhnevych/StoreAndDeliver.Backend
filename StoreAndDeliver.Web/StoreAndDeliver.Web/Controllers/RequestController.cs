@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StoreAndDeliver.BusinessLayer.Calculations.Statistics;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
@@ -17,10 +18,30 @@ namespace StoreAndDeliver.Web.Controllers
     public class RequestController : ControllerBase
     {
         private readonly IRequestService _requestService;
+        private readonly IRequestStatistics _requestStatistics;
 
-        public RequestController(IRequestService requestService)
+        public RequestController(IRequestService requestService, IRequestStatistics requestStatistics)
         {
             _requestService = requestService;
+            _requestStatistics = requestStatistics;
+        }
+
+        [HttpGet]
+        [Route("countriesStatistics")]
+        [Authorize(Roles = Role.CompanyAdmin)]
+        public IActionResult GetRequestsByCountriesStatistics()
+        {
+            var result = _requestStatistics.GetRequestsByCountriesStatistics();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [Route("citiesStatistics")]
+        [Authorize(Roles = Role.CompanyAdmin)]
+        public IActionResult GetRequestsByCitiesStatistics()
+        {
+            var result = _requestStatistics.GetRequestsByCitiesStatistics();
+            return Ok(result);
         }
 
         [HttpPost]

@@ -16,8 +16,9 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms
     public class StoreAlgorithms : IStoreAlgorithms
     {
         private const int defaultGeoDistance = 2;
+        private const int defaultGeoDictionarySize = 2;
         private const int defaultOptimalStoreDistance = 200000;
-        private const int defaultOptimalCitiesCount = 5;
+        private const int defaultOptimalCitiesCount = 3;
         private readonly IRequestQueryBuilder _requestQueryBuilder;
         private readonly IStoreRepository _storeRepository;
         private readonly ICitiesQueryBuilder _citiesQueryBuilder;
@@ -109,11 +110,10 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms
                     results[city] = distanceToMiddleStoreCoordinates;
                 }
             }
-            var t = results.OrderBy(r => r.Value);
             return results.OrderBy(r => r.Value).Select(r => r.Key);
         }
 
-        private IDictionary<KeyValuePair<GeoCoordinate, GeoCoordinate>, List<Request>> GetCurrentStoresGeoRange
+        private static IDictionary<KeyValuePair<GeoCoordinate, GeoCoordinate>, List<Request>> GetCurrentStoresGeoRange
             (IEnumerable<Request> storeRequests)
         {
             var geoDictionary = new Dictionary<KeyValuePair<GeoCoordinate, GeoCoordinate>, List<Request>>();
@@ -156,6 +156,7 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms
             }
             return geoDictionary
                 .OrderByDescending(c => c.Value.Count)
+                .Take(defaultGeoDictionarySize)
                 .ToDictionary(c => c.Key, v => v.Value);
         }
     }

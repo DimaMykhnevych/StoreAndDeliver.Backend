@@ -36,6 +36,13 @@ namespace StoreAndDeliver.DataLayer.Repositories.CarrierRepository
             return await context.Carriers.Include(c => c.AppUser).ToListAsync();
         }
 
+        public async Task<IEnumerable<Carrier>> GetCarrierWithCargoSessions() {
+            return await context.Carriers
+                .Include(c => c.AppUser)
+                .Include(c => c.CargoSeesions)
+                .ToListAsync();
+        }
+
         public async Task UpdateCarrier(Carrier carrier)
         {
             var local = context.Set<Carrier>()

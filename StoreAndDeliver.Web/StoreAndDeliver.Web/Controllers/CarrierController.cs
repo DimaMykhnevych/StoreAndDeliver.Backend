@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using StoreAndDeliver.BusinessLayer.Calculations.Statistics.CarrierStatistics;
 using StoreAndDeliver.BusinessLayer.Constants;
 using StoreAndDeliver.BusinessLayer.DTOs;
 using StoreAndDeliver.BusinessLayer.Exceptions;
@@ -19,10 +20,12 @@ namespace StoreAndDeliver.Web.Controllers
     public class CarrierController : ControllerBase
     {
         private readonly ICarrierService _carrierService;
+        private readonly ICarrierStatistics _carrierStatistics;
 
-        public CarrierController(ICarrierService carrierService)
+        public CarrierController(ICarrierService carrierService, ICarrierStatistics carrierStatistics)
         {
             _carrierService = carrierService;
+            _carrierStatistics = carrierStatistics;
         }
 
         [HttpGet]
@@ -31,6 +34,15 @@ namespace StoreAndDeliver.Web.Controllers
         {
             IEnumerable<CarrierDto> carriers = await _carrierService.GetCarriers();
             return Ok(carriers);
+        }
+
+        [HttpGet]
+        [Route("getCarrierStatistics")]
+        [Authorize(Roles = Role.CompanyAdmin)]
+        public async Task<IActionResult> GetCarriersStatistics()
+        {
+            IEnumerable<CarrierStatisticsDto> result = await _carrierStatistics.GetCarrierStatistics();
+            return Ok(result);
         }
 
         [HttpGet("getCurrentLoggedInCarrier")]

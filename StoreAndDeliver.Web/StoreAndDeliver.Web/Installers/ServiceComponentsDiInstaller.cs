@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using StoreAndDeliver.BusinessLayer.Calculations.Algorithms;
 using StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms;
+using StoreAndDeliver.BusinessLayer.Calculations.Statistics;
+using StoreAndDeliver.BusinessLayer.Calculations.Statistics.CarrierStatistics;
 using StoreAndDeliver.BusinessLayer.Clients.ExchangerApiClient;
 using StoreAndDeliver.BusinessLayer.Factories;
 using StoreAndDeliver.BusinessLayer.Services.AddressService;
@@ -71,6 +73,8 @@ namespace StoreAndDeliver.Web.Installers
             // optimization and calculations
             services.AddTransient<IStoreAlgorithms, StoreAlgorithms>();
             services.AddTransient<IRequestAlgorithms, RequestAlgorithms>();
+            services.AddTransient<IRequestStatistics, RequestStatistics>();
+            services.AddTransient<ICarrierStatistics, CarrierStatistics>();
 
             //clients
             services.AddHttpClient<IExchangerApiClient, ExchangerApiClient>();
