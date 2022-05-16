@@ -31,6 +31,23 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
             _mapper = mapper;
         }
 
+        public async Task<IEnumerable<RecommendedSettingsDto>> GetRecommendationCargoSettings(
+            GetRecommendedSettingsDto recommendedSettingsDto)
+        {
+            var cargo = await _cargoRepository.GetCargo();
+            var resultCargo = cargo
+                .Where(c => c.Description.ToLower().Contains(recommendedSettingsDto.CargoDescription.ToLower()))
+                .SelectMany(c => c.CargoSettings);
+            await ConvertCargoSettings(resultCargo, GetDefaultUnits(), recommendedSettingsDto.Units);
+            return resultCargo.GroupBy(g => g.EnvironmentSettingId)
+                .Select(g => new RecommendedSettingsDto()
+                {
+                    EnvironmentSetting = _mapper.Map<EnvironmentSettingDto>(g.First().EnvironmentSetting),
+                    MinValue = Math.Round(g.Sum(c => c.MinValue) / g.Count(), 1),
+                    MaxValue = Math.Round(g.Sum(c => c.MaxValue) / g.Count(), 1)
+                }); ;
+        }
+
         public async Task<CargoDto> AddCargo(AddCargoDto addCargoDto, Units units)
         {
             Cargo cargo = _mapper.Map<Cargo>(addCargoDto);
@@ -41,14 +58,14 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
             }
             var unitsTo = new Units()
             {
-                Weight = WeightUnit.Kilograms, 
+                Weight = WeightUnit.Kilograms,
                 Length = LengthUnit.Meters,
                 Temperature = TemperatureUnit.Celsius,
                 Luminosity = LuminosityUnit.Lux,
                 Humidity = HumidityUnit.Percentage
             };
             ConvertCargoUnits(cargo, units, unitsTo);
-            foreach(var setting in cargo.CargoSettings)
+            foreach (var setting in cargo.CargoSettings)
             {
                 setting.Id = Guid.NewGuid();
             }
@@ -146,5 +163,16 @@ namespace StoreAndDeliver.BusinessLayer.Services.CargoService
             return cargoSettings.Where(c => c.EnvironmentSetting.Name == name);
         }
 
+        private static Units GetDefaultUnits()
+        {
+            return new Units()
+            {
+                Weight = WeightUnit.Kilograms,
+                Length = LengthUnit.Meters,
+                Temperature = TemperatureUnit.Celsius,
+                Luminosity = LuminosityUnit.Lux,
+                Humidity = HumidityUnit.Percentage
+            };
+        }
     }
 }
