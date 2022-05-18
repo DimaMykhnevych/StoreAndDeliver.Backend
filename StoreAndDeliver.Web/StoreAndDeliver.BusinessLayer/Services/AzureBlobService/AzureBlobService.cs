@@ -27,15 +27,15 @@ namespace StoreAndDeliver.BusinessLayer.Services.AzureBlobService
         public async Task<IEnumerable<CargoPhotoDto>> GetCargoPhotos(Guid cargoRequestId)
         {
             _logger.LogInformation($"Start getting photos for cargo request with id: {cargoRequestId}");
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageAccountOptions.ConnectionString);
+            BlobServiceClient blobServiceClient = new(_azureStorageAccountOptions.ConnectionString);
             var container = blobServiceClient.GetBlobContainerClient(AzureStorageConstants.CargoPhotosContainerName);
-            BlobSasBuilder sasBuilder = new BlobSasBuilder()
+            BlobSasBuilder sasBuilder = new()
             {
                 ExpiresOn = DateTime.UtcNow.AddMinutes(5),
                 Resource = "b"
             };
             sasBuilder.SetPermissions(BlobAccountSasPermissions.Read);
-            var results = new List<CargoPhotoDto>();
+            List<CargoPhotoDto> results = new();
             await foreach (var blob in container.GetBlobsAsync(prefix: cargoRequestId.ToString()))
             {
                 BlobClient blobClient = container.GetBlobClient(blob.Name);
@@ -53,7 +53,8 @@ namespace StoreAndDeliver.BusinessLayer.Services.AzureBlobService
             BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageAccountOptions.ConnectionString);
             var container = blobServiceClient.GetBlobContainerClient(AzureStorageConstants.CargoPhotosContainerName);
 
-            if (!photo.ContentType.Contains("image") || photo.Length <= 0) {
+            if (!photo.ContentType.Contains("image") || photo.Length <= 0)
+            {
                 return false;
             }
             try
