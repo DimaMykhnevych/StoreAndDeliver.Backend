@@ -48,6 +48,10 @@ namespace StoreAndDeliver.Web.Controllers
         [Authorize(Roles = Role.Carrier)]
         public async Task<IActionResult> UploadCargoPhoto(Guid cargoRequestId, [FromForm] IFormFile file)
         {
+            if(file == null)
+            {
+                file = HttpContext.Request.Form.Files[0];
+            }
             var result = await _azureBlobService.UploadCargoPhoto(cargoRequestId, file);
             return Ok(result);
         }

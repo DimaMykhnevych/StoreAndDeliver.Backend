@@ -50,6 +50,12 @@ namespace StoreAndDeliver.BusinessLayer.Services.AzureBlobService
 
         public async Task<bool> UploadCargoPhoto(Guid cargoRequestId, IFormFile photo)
         {
+            if(photo == null)
+            {
+                _logger.LogError($"Error during uploadin cargo photo to blob: photo is null");
+                return false;
+            }
+
             BlobServiceClient blobServiceClient = new BlobServiceClient(_azureStorageAccountOptions.ConnectionString);
             var container = blobServiceClient.GetBlobContainerClient(AzureStorageConstants.CargoPhotosContainerName);
 
