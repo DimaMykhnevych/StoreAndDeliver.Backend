@@ -25,6 +25,7 @@ namespace StoreAndDeliver.DataLayer.DbContext
         public DbSet<City> Cities { get; set; }
         public DbSet<CargoSnapshot> CargoSnapshots { get; set; }
         public DbSet<CargoSessionNote> CargoSessionNotes { get; set; }
+        public DbSet<Feedback> Feedback { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

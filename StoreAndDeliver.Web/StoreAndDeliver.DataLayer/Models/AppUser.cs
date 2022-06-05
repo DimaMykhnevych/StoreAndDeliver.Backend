@@ -10,6 +10,7 @@ namespace StoreAndDeliver.DataLayer.Models
         public DateTime RegistryDate { get; set; }
 
         public ICollection<Request> Requests { get; set; }
+        public ICollection<Feedback> Feedback { get; set; }
         public virtual Carrier Carrier { get; set; }
     }
 }

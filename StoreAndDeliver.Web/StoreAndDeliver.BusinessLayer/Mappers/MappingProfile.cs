@@ -31,6 +31,10 @@ namespace StoreAndDeliver.BusinessLayer.Mappers
             CreateMap<AddCargoSessionNoteDto, CargoSessionNote>().ReverseMap();
             CreateMap<CargoIoTDto, Cargo>().ReverseMap();
             CreateMap<CargoRequestIoTDto, CargoRequest>().ReverseMap();
+
+            CreateMap<Feedback, GetFeedbackDto>()
+                .ForMember(f => f.UserEmail, m => m.MapFrom(u => u.AppUser.Email))
+                .ForMember(f => f.Username, m => m.MapFrom(u => u.AppUser.UserName));
         }
     }
 }

@@ -20,6 +20,7 @@ using StoreAndDeliver.BusinessLayer.Services.CityService;
 using StoreAndDeliver.BusinessLayer.Services.ConvertionService;
 using StoreAndDeliver.BusinessLayer.Services.EmailService;
 using StoreAndDeliver.BusinessLayer.Services.EnvironmnetSettingService;
+using StoreAndDeliver.BusinessLayer.Services.FeedbackService;
 using StoreAndDeliver.BusinessLayer.Services.RequestService;
 using StoreAndDeliver.BusinessLayer.Services.StoreService;
 using StoreAndDeliver.BusinessLayer.Services.UserService;
@@ -37,6 +38,7 @@ using StoreAndDeliver.DataLayer.Repositories.CargoSnapshotsRepository;
 using StoreAndDeliver.DataLayer.Repositories.CarrierRepository;
 using StoreAndDeliver.DataLayer.Repositories.CityRepository;
 using StoreAndDeliver.DataLayer.Repositories.EnvironmentSettingReporitory;
+using StoreAndDeliver.DataLayer.Repositories.FeedbackRepository;
 using StoreAndDeliver.DataLayer.Repositories.LogsRepository;
 using StoreAndDeliver.DataLayer.Repositories.RequestRepository;
 using StoreAndDeliver.DataLayer.Repositories.StoreRepository;
@@ -69,6 +71,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ICargoSnapshotService, CargoSnapshotService>();
             services.AddTransient<ICargoSessionNoteService, CargoSessionNoteService>();
             services.AddTransient<IAzureBlobService, AzureBlobService>();
+            services.AddTransient<IFeedbackService, FeedbackService>();
 
             // optimization and calculations
             services.AddTransient<IStoreAlgorithms, StoreAlgorithms>();
@@ -100,6 +103,7 @@ namespace StoreAndDeliver.Web.Installers
             services.AddTransient<ILogsRepository, LogsRepository>();
             services.AddTransient<ICargoSnapshotsRepository, CargoSnapshotsRepository>();
             services.AddTransient<ICargoSessionNoteRepository, CargoSessionNoteRepository>();
+            services.AddTransient<IFeedbackRepository, FeedbackRepository>();
         }
     }
 }
