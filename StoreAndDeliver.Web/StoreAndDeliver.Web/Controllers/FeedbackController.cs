@@ -33,7 +33,7 @@ namespace StoreAndDeliver.Web.Controllers
         }
 
         [HttpGet]
-        [Route("GetUserFeedback")]
+        [Route("getUserFeedback")]
         [Authorize(Roles = Role.User)]
         public async Task<IActionResult> GetUserFeedback()
         {
