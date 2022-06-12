@@ -48,8 +48,10 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms
 
             _logger.LogInformation("Start getting current stores geo range");
             var currentStoresGeoRange = GetCurrentStoresGeoRange(storeRequests);
+            _logger.LogInformation($"Current stores geo range amount: {currentStoresGeoRange.Count}");
             _logger.LogInformation("Start getting optimal locations");
             var optimalLocations = await GetOptimalLocations(currentStoresGeoRange);
+            _logger.LogInformation($"Optimal Locations amount: {optimalLocations.Count}");
             var result = new List<OptimalStoreLocationDto>();
             foreach(var item in optimalLocations)
             {
@@ -80,6 +82,7 @@ namespace StoreAndDeliver.BusinessLayer.Calculations.Algorithms.StoreAlgorithms
                     .Take(defaultOptimalCitiesCount)
                     .ToList();
                 result[item.Key] = optimalLocation;
+                _logger.LogInformation($"Optimal Locations: {optimalLocation.Count}");
             }
 
             return result;
